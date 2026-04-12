@@ -3,7 +3,6 @@ import * as trainerProfileService from "../services/trainerProfileService.js";
 
 const router = Router();
 
-// GET - Obtener todos los perfiles de entrenador
 router.get("/", async (req, res) => {
   try {
     const profiles = await trainerProfileService.getAllTrainerProfiles();
@@ -16,7 +15,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET - Obtener un perfil por ID
 router.get("/:id", async (req, res) => {
   try {
     const profile = await trainerProfileService.getTrainerProfileById(
@@ -32,7 +30,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET - Obtener perfil por ID de usuario
 router.get("/user/:userId", async (req, res) => {
   try {
     const profile = await trainerProfileService.getTrainerProfileByUserId(
@@ -48,7 +45,6 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// POST - Crear un nuevo perfil de entrenador
 router.post("/", async (req, res) => {
   try {
     const newProfile = await trainerProfileService.createTrainerProfile(
@@ -63,7 +59,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT - Actualizar un perfil
 router.put("/:id", async (req, res) => {
   try {
     const updatedProfile = await trainerProfileService.updateTrainerProfile(
@@ -78,7 +73,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE - Eliminar un perfil
 router.delete("/:id", async (req, res) => {
   try {
     await trainerProfileService.deleteTrainerProfile(req.params.id);

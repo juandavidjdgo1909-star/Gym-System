@@ -3,7 +3,6 @@ import * as paymentService from "../services/paymentService.js";
 
 const router = Router();
 
-// GET - Obtener todos los pagos
 router.get("/", async (req, res) => {
   try {
     const payments = await paymentService.getAllPayments();
@@ -15,7 +14,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET - Obtener un pago por ID
 router.get("/:id", async (req, res) => {
   try {
     const payment = await paymentService.getPaymentById(req.params.id);
@@ -29,7 +27,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET - Obtener pagos por usuario
 router.get("/user/:userId", async (req, res) => {
   try {
     const payments = await paymentService.getPaymentsByUser(req.params.userId);
@@ -43,7 +40,6 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// POST - Crear un nuevo pago
 router.post("/", async (req, res) => {
   try {
     const newPayment = await paymentService.createPayment(req.body);
@@ -55,7 +51,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT - Actualizar un pago
 router.put("/:id", async (req, res) => {
   try {
     const updatedPayment = await paymentService.updatePayment(
@@ -70,7 +65,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE - Eliminar un pago
 router.delete("/:id", async (req, res) => {
   try {
     await paymentService.deletePayment(req.params.id);

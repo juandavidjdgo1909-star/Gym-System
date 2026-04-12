@@ -3,7 +3,6 @@ import * as trainingSessionService from "../services/trainingSessionService.js";
 
 const router = Router();
 
-// GET - Obtener todas las sesiones de entrenamiento
 router.get("/", async (req, res) => {
   try {
     const sessions = await trainingSessionService.getAllTrainingSessions();
@@ -16,7 +15,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET - Obtener una sesión por ID
 router.get("/:id", async (req, res) => {
   try {
     const session = await trainingSessionService.getTrainingSessionById(
@@ -32,7 +30,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET - Obtener sesiones de un entrenador
 router.get("/trainer/:trainerId", async (req, res) => {
   try {
     const sessions = await trainingSessionService.getSessionsByTrainer(
@@ -48,7 +45,6 @@ router.get("/trainer/:trainerId", async (req, res) => {
   }
 });
 
-// GET - Obtener sesiones de un miembro
 router.get("/member/:memberId", async (req, res) => {
   try {
     const sessions = await trainingSessionService.getSessionsByMember(
@@ -64,7 +60,6 @@ router.get("/member/:memberId", async (req, res) => {
   }
 });
 
-// POST - Crear una nueva sesión
 router.post("/", async (req, res) => {
   try {
     const newSession = await trainingSessionService.createTrainingSession(
@@ -79,7 +74,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT - Actualizar una sesión
 router.put("/:id", async (req, res) => {
   try {
     const updatedSession = await trainingSessionService.updateTrainingSession(
@@ -94,7 +88,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE - Eliminar una sesión
 router.delete("/:id", async (req, res) => {
   try {
     await trainingSessionService.deleteTrainingSession(req.params.id);

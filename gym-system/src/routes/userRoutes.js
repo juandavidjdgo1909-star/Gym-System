@@ -3,7 +3,6 @@ import * as userService from "../services/userService.js";
 
 const router = Router();
 
-//  Obtener todos los usuarios
 router.get("/", async (req, res) => {
   try {
     const users = await userService.getAllUsers();
@@ -15,7 +14,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Obtener un usuario por ID
 router.get("/:id", async (req, res) => {
   try {
     const user = await userService.getUserById(req.params.id);
@@ -29,7 +27,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Crear un nuevo usuario
 router.post("/", async (req, res) => {
   try {
     const newUser = await userService.createUser(req.body);
@@ -41,7 +38,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-//  Actualizar un usuario
 router.put("/:id", async (req, res) => {
   try {
     const updatedUser = await userService.updateUser(req.params.id, req.body);
@@ -53,7 +49,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Eliminar un usuario
 router.delete("/:id", async (req, res) => {
   try {
     await userService.deleteUser(req.params.id);

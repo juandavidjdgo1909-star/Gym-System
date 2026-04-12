@@ -1,11 +1,9 @@
 import TrainerProfile from "../models/trainerProfile.js";
 
-// Obtener todos los perfiles de entrenador
 export const getAllTrainerProfiles = async () => {
   return await TrainerProfile.find().populate("user", "name email phone");
 };
 
-// Obtener un perfil por ID
 export const getTrainerProfileById = async (id) => {
   const profile = await TrainerProfile.findById(id).populate(
     "user",
@@ -17,7 +15,6 @@ export const getTrainerProfileById = async (id) => {
   return profile;
 };
 
-// Obtener perfil por ID de usuario
 export const getTrainerProfileByUserId = async (userId) => {
   const profile = await TrainerProfile.findOne({ user: userId }).populate(
     "user",
@@ -29,7 +26,6 @@ export const getTrainerProfileByUserId = async (userId) => {
   return profile;
 };
 
-// Crear un nuevo perfil de entrenador
 export const createTrainerProfile = async (profileData) => {
   const profile = new TrainerProfile(profileData);
   const newProfile = await profile.save();
@@ -37,7 +33,6 @@ export const createTrainerProfile = async (profileData) => {
   return newProfile;
 };
 
-// Actualizar un perfil
 export const updateTrainerProfile = async (id, profileData) => {
   const profile = await TrainerProfile.findById(id);
   if (!profile) {
@@ -49,7 +44,6 @@ export const updateTrainerProfile = async (id, profileData) => {
   return updatedProfile;
 };
 
-// Eliminar un perfil
 export const deleteTrainerProfile = async (id) => {
   const profile = await TrainerProfile.findByIdAndDelete(id);
   if (!profile) {

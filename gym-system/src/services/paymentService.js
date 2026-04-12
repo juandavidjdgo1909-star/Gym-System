@@ -1,13 +1,11 @@
 import Payment from "../models/payment.js";
 
-// Obtener todos los pagos
 export const getAllPayments = async () => {
   return await Payment.find()
     .populate("user", "name email")
     .populate("membership", "name price");
 };
 
-// Obtener un pago por ID
 export const getPaymentById = async (id) => {
   const payment = await Payment.findById(id)
     .populate("user", "name email")
@@ -18,7 +16,6 @@ export const getPaymentById = async (id) => {
   return payment;
 };
 
-// Obtener pagos por usuario
 export const getPaymentsByUser = async (userId) => {
   return await Payment.find({ user: userId }).populate(
     "membership",
@@ -26,7 +23,6 @@ export const getPaymentsByUser = async (userId) => {
   );
 };
 
-// Crear un nuevo pago
 export const createPayment = async (paymentData) => {
   const payment = new Payment(paymentData);
   const newPayment = await payment.save();
@@ -35,7 +31,6 @@ export const createPayment = async (paymentData) => {
   return newPayment;
 };
 
-// Actualizar un pago
 export const updatePayment = async (id, paymentData) => {
   const payment = await Payment.findById(id);
   if (!payment) {
@@ -48,7 +43,6 @@ export const updatePayment = async (id, paymentData) => {
   return updatedPayment;
 };
 
-// Eliminar un pago
 export const deletePayment = async (id) => {
   const payment = await Payment.findByIdAndDelete(id);
   if (!payment) {

@@ -3,7 +3,6 @@ import * as subscriptionService from "../services/subscriptionService.js";
 
 const router = Router();
 
-// GET - Obtener todas las suscripciones
 router.get("/", async (req, res) => {
   try {
     const subscriptions = await subscriptionService.getAllSubscriptions();
@@ -15,7 +14,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET - Obtener una suscripción por ID
 router.get("/:id", async (req, res) => {
   try {
     const subscription = await subscriptionService.getSubscriptionById(
@@ -31,7 +29,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET - Obtener suscripciones de un usuario
 router.get("/user/:userId", async (req, res) => {
   try {
     const subscriptions = await subscriptionService.getSubscriptionsByUser(
@@ -47,7 +44,6 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// POST - Crear una nueva suscripción
 router.post("/", async (req, res) => {
   try {
     const newSubscription = await subscriptionService.createSubscription(
@@ -61,7 +57,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT - Actualizar una suscripción
 router.put("/:id", async (req, res) => {
   try {
     const updatedSubscription = await subscriptionService.updateSubscription(
@@ -76,7 +71,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE - Eliminar una suscripción
 router.delete("/:id", async (req, res) => {
   try {
     await subscriptionService.deleteSubscription(req.params.id);

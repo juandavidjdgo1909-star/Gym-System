@@ -3,7 +3,6 @@ import * as membershipService from "../services/membershipService.js";
 
 const router = Router();
 
-// GET Obtener todas las membresías
 router.get("/", async (req, res) => {
   try {
     const memberships = await membershipService.getAllMemberships();
@@ -15,7 +14,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET Obtener una membresía por ID
 router.get("/:id", async (req, res) => {
   try {
     const membership = await membershipService.getMembershipById(req.params.id);
@@ -29,7 +27,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-//POST Crear una nueva membresía
 router.post("/", async (req, res) => {
   try {
     const newMembership = await membershipService.createMembership(req.body);
@@ -41,7 +38,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-//PUT  Actualizar una membresía
 router.put("/:id", async (req, res) => {
   try {
     const updatedMembership = await membershipService.updateMembership(
@@ -56,7 +52,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-//DELETE  Eliminar una membresía
 router.delete("/:id", async (req, res) => {
   try {
     await membershipService.deleteMembership(req.params.id);
