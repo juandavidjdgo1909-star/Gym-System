@@ -2,46 +2,295 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Gym System Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym-System | Inicio de sesión</title>
     <link href="./css/output.css" rel="stylesheet" />
   </head>
-
-  <body class="bg-gray-900 flex items-center justify-center h-screen">
-    <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-96">
-      <h2 class="text-3xl font-bold text-white text-center mb-6">
-        💪 Gym System
-      </h2>
-      <form class="space-y-4">
-        <div>
-          <label class="text-gray-300">Correo</label>
-          <input
-            type="email"
-            placeholder="ejemplo@gmail.com"
-            class="w-full mt-1 p-2 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label class="text-gray-300">Contraseña</label>
-          <input
-            type="password"
-            placeholder="********"
-            class="w-full mt-1 p-2 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+  <body class="min-h-screen bg-slate-950 text-white">
+    <main
+      class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"
+    >
+      <section
+        class="mx-auto grid min-h-screen max-w-7xl items-center px-6 py-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch lg:px-10"
+      >
+        <div
+          class="rounded-t-[32px] border border-b-0 border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl sm:p-10 lg:h-full lg:rounded-l-[32px] lg:rounded-r-none lg:border-b lg:border-r-0"
         >
-          Iniciar Sesión
-        </button>
-      </form>
+          <div class="flex h-full flex-col justify-between gap-10">
+            <header class="space-y-5">
+              <span
+                class="inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-sm font-medium uppercase tracking-[0.2em] text-cyan-200 transition duration-300 hover:border-cyan-300/50 hover:bg-cyan-300/10"
+              >
+                Gym-System
+              </span>
+              <h1
+                class="max-w-xl text-4xl font-semibold leading-tight sm:text-5xl"
+              >
+                El centro de mando para para membresias, agenda y caja en vivo,
+                todo en una sola plataforma.
+              </h1>
+              <p
+                class="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg"
+              >
+                Una experiencia visual elegante para administrar el gym, dar
+                seguimiento a entrenadores y ofrecer a los miembros una vista
+                clara de sus planes.
+              </p>
+            </header>
 
-      <p class="text-gray-400 text-sm text-center mt-4">
-        ¿No tienes cuenta?
-        <a href="#" class="text-blue-400 hover:underline">Regístrate</a>
-      </p>
-    </div>
+            <div class="space-y-5">
+              <div class="grid gap-4 sm:grid-cols-3">
+                <article
+                  class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5"
+                >
+                  <p class="text-4xl font-semibold text-white">3</p>
+                  <p
+                    class="mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100"
+                  >
+                    Roles
+                  </p>
+                </article>
+
+                <article
+                  class="rounded-2xl border border-sky-400/20 bg-sky-400/10 p-5"
+                >
+                  <p
+                    id="plan-count"
+                    data-plan-count="0"
+                    class="text-4xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                  <p
+                    class="mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-sky-100"
+                  >
+                    Membresías
+                  </p>
+                </article>
+
+                <article
+                  class="rounded-2xl border border-violet-400/20 bg-violet-400/10 p-5"
+                >
+                  <p class="text-4xl font-semibold text-white">24/7</p>
+                  <p
+                    class="mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-violet-100"
+                  >
+                    Horas
+                  </p>
+                </article>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-3">
+                <article
+                  class="rounded-2xl border border-white/10 bg-black/20 p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:bg-white/10"
+                >
+                  <p class="text-sm text-slate-400">Perfiles</p>
+                  <h3 class="mt-3 text-2xl font-semibold">Roles</h3>
+                  <p class="mt-2 text-sm leading-6 text-slate-300">
+                    Admin, Miembro y Entrenador se uno de ellos.
+                  </p>
+                </article>
+
+                <article
+                  class="rounded-2xl border border-white/10 bg-black/20 p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:bg-white/10"
+                >
+                  <p class="text-sm text-slate-400">Compra</p>
+                  <h3 class="mt-3 text-2xl font-semibold">Membresías</h3>
+                  <p class="mt-2 text-sm leading-6 text-slate-300">
+                    Membresias que se ajustan a tu interes, dinero y tiempo.
+                  </p>
+                </article>
+
+                <article
+                  class="rounded-2xl border border-white/10 bg-black/20 p-5 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:bg-white/10"
+                >
+                  <p class="text-sm text-slate-400">Cobertura</p>
+                  <h3 class="mt-3 text-2xl font-semibold">
+                    Seguimiento continuo
+                  </h3>
+                  <p class="mt-2 text-sm leading-6 text-slate-300">
+                    Información visible en cualquier momento para la operación.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rounded-b-[32px] border border-white/10 bg-slate-950/60 p-6 shadow-2xl sm:p-8 lg:flex lg:h-full lg:items-center lg:rounded-l-none lg:rounded-r-[32px] lg:p-10"
+        >
+          <div class="mx-auto w-full max-w-lg">
+            <section
+              class="rounded-3xl border border-white/10 bg-slate-900/80 p-5 shadow-2xl transition duration-500 hover:border-cyan-400/20 hover:shadow-cyan-500/10 sm:p-6"
+            >
+              <header class="mb-4">
+                <p class="text-sm uppercase tracking-[0.3em] text-slate-400">
+                  Acceso seguro
+                </p>
+                <h2 class="mt-2 text-3xl font-semibold text-white">
+                  Bienvenido de vuelta
+                </h2>
+                <p class="mt-2 text-sm leading-5 text-slate-400">
+                  Ingresa con tus credenciales para disfrutar de una gran
+                  experiencia.
+                </p>
+              </header>
+
+              <div
+                class="mb-4 flex rounded-2xl border border-white/10 bg-slate-950/70 p-1"
+              >
+                <button
+                  id="btn-login"
+                  type="button"
+                  class="w-1/2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition-all duration-300 hover:scale-[0.99]"
+                >
+                  Login
+                </button>
+                <button
+                  id="btn-register"
+                  type="button"
+                  class="w-1/2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-300 transition-all duration-300 hover:bg-white/5 hover:text-white"
+                >
+                  Registro
+                </button>
+              </div>
+
+              <form
+                id="login-form"
+                class="space-y-3 transition-all duration-300"
+              >
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="loginEmail"
+                  >
+                    Correo electrónico
+                  </label>
+                  <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="example@gmail.com"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="login-password"
+                    >
+                      Contraseña
+                    </label>
+                  </div>
+                  <input
+                    id="login-password"
+                    type="password"
+                    placeholder="Ingresa tu contraseña"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+
+                <button
+                  class="w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-cyan-400/30 hover:brightness-105"
+                >
+                  Acceder
+                </button>
+              </form>
+
+              <form
+                id="register-form"
+                class="hidden space-y-3 transition-all duration-300"
+              >
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="register-name"
+                    >
+                      Nombre completo
+                    </label>
+                    <input
+                      id="register-name"
+                      type="text"
+                      placeholder="Nombre completo"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="register-email"
+                    >
+                      Correo electrónico
+                    </label>
+                    <input
+                      id="register-email"
+                      type="email"
+                      placeholder="example@gmail.com"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="register-phone"
+                    >
+                      Número de teléfono
+                    </label>
+                    <input
+                      id="register-phone"
+                      type="tel"
+                      placeholder="300 000 0000"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="register-document"
+                    >
+                      Documento
+                    </label>
+                    <input
+                      id="register-document"
+                      type="text"
+                      placeholder="Número de documento"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="register-password"
+                  >
+                    Contraseña
+                  </label>
+                  <input
+                    id="register-password"
+                    type="password"
+                    placeholder="Crea una contraseña"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition-all duration-300 placeholder:text-slate-500 focus:-translate-y-0.5 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+
+                <button
+                  class="w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-cyan-400/30 hover:brightness-105"
+                >
+                  Crear cuenta
+                </button>
+              </form>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="./js/index.js"></script>
   </body>
 </html>
