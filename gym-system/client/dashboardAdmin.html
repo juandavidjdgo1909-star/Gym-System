@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym-System | Dashboard Admin</title>
+    <link href="./css/output.css" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-white">
+    <main
+      class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_28%),linear-gradient(135deg,_#020617_0%,_#0b1120_38%,_#111827_100%)]"
+    >
+      <div
+        class="mx-auto flex min-h-screen max-w-[1600px] items-start gap-6 px-4 py-4 lg:px-6"
+      >
+        <aside
+          class="hidden w-[290px] shrink-0 self-start rounded-[30px] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl lg:sticky lg:top-4 lg:flex lg:flex-col"
+        >
+          <div class="border-b border-white/10 pb-5">
+            <span
+              class="inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200"
+              >Gym-System</span
+            >
+            <div
+              class="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-slate-400">
+                Panel central
+              </p>
+              <h1 class="mt-3 text-3xl font-semibold leading-tight text-white">
+                Control total del gimnasio
+              </h1>
+              <p class="mt-3 text-sm leading-6 text-slate-300">
+                Caja, miembros, entrenadores, agenda y planes desde una sola
+                consola administrativa.
+              </p>
+            </div>
+          </div>
+
+          <nav class="mt-6 space-y-6">
+            <div>
+              <p
+                class="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500"
+              >
+                Principal
+              </p>
+              <div class="space-y-2">
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-100"
+                  href="#resumen"
+                  >Resumen general</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#caja"
+                  >Caja y pagos</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#miembros"
+                  >Miembros y roles</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#membresias"
+                  >Membresías</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#agenda"
+                  >Agenda entrenador</a
+                >
+              </div>
+            </div>
+          </nav>
+          <div
+            class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="font-semibold text-white">Administración</p>
+                <p class="mt-1 text-sm text-slate-400">
+                  coordinador@gym-system.com
+                </p>
+              </div>
+              <button
+                class="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm font-medium text-rose-200 transition hover:border-rose-300/40 hover:bg-rose-300/10"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </aside>
+        <section
+          class="flex-1 rounded-[30px] border border-white/10 bg-slate-900/60 p-4 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-5 lg:p-6"
+        >
+          <header
+            class="rounded-[28px] border border-white/10 bg-gradient-to-r from-white/[0.06] to-white/[0.02] p-5 sm:p-6"
+          >
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80"
+              >
+                Dashboard Admin
+              </p>
+              <h2
+                class="mt-3 max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-4xl"
+              >
+                Centro de control para caja, miembros, entrenadores y membresías
+              </h2>
+              <p
+                class="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base"
+              >
+                Todo generado en tiempo real, mostrando actualizaciones
+                generales, creando y actualizando datos.
+              </p>
+            </div>
+          </header>
+          <div class="mt-5 grid gap-4 lg:grid-cols-3">
+            <div
+              class="rounded-[28px] border border-emerald-400/20 bg-emerald-400/10 px-6 py-6"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-emerald-200"
+              >
+                Caja del día
+              </p>
+              <p
+                id="summary-cash-total"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                $ 0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-emerald-100/80">
+                <span
+                  id="summary-payments-count"
+                  class="font-semibold text-white"
+                  >0</span
+                >
+                Pagos Registrados
+              </p>
+            </div>
+            <div
+              class="rounded-[28px] border border-sky-400/20 bg-sky-400/10 px-6 py-6"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200"
+              >
+                Miembros activos
+              </p>
+              <p
+                id="summary-members-count"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-sky-100/80">
+                <span id="summary-new-members" class="font-semibold text-white"
+                  >0</span
+                >
+                Miembros Nuevos Hoy
+              </p>
+            </div>
+            <div
+              class="rounded-[28px] border border-violet-400/20 bg-violet-400/10 px-6 py-6"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-violet-200"
+              >
+                Planes activos
+              </p>
+              <p
+                id="summary-membership-plans"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-violet-100/80">
+                <span
+                  id="summary-highlighted-plans"
+                  class="font-semibold text-white"
+                  >0</span
+                >
+                Planes Creados
+              </p>
+            </div>
+          </div>
+          <div id="resumen" class="mt-6">
+            <section class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+              <article
+                class="rounded-[26px] border border-white/10 bg-white/[0.04] p-5"
+              >
+                <p class="text-sm font-medium text-slate-300">
+                  Usuarios totales
+                </p>
+                <p
+                  id="stats-users-total"
+                  class="mt-5 text-4xl font-semibold text-white"
+                >
+                  0
+                </p>
+                <p class="mt-5 text-sm leading-6 text-slate-400">
+                  Se actualiza al crear un usuario
+                </p>
+              </article>
+              <article
+                class="rounded-[26px] border border-white/10 bg-white/[0.04] p-5"
+              >
+                <p class="text-sm font-medium text-slate-300">Entrenadores</p>
+                <p
+                  id="stats-trainers-total"
+                  class="mt-5 text-4xl font-semibold text-white"
+                >
+                  0
+                </p>
+                <p class="mt-5 text-sm leading-6 text-slate-400">
+                  Perfiles creados con rol Entrenador
+                </p>
+              </article>
+              <article
+                class="rounded-[26px] border border-white/10 bg-white/[0.04] p-5"
+              >
+                <p class="text-sm font-medium text-slate-300">Membresías</p>
+                <p
+                  id="stats-subscriptions-total"
+                  class="mt-5 text-4xl font-semibold text-white"
+                >
+                  0
+                </p>
+                <p class="mt-5 text-sm leading-6 text-slate-400">
+                  Conteo de membresías activas del sistema
+                </p>
+              </article>
+              <article
+                class="rounded-[26px] border border-white/10 bg-white/[0.04] p-5"
+              >
+                <p class="text-sm font-medium text-slate-300">Sesiones hoy</p>
+                <p
+                  id="stats-sessions-today"
+                  class="mt-5 text-4xl font-semibold text-white"
+                >
+                  0
+                </p>
+                <p class="mt-5 text-sm leading-6 text-slate-400">
+                  Sesiones registradas para el día de hoy
+                </p>
+              </article>
+            </section>
+          </div>
+          <div class="mt-6">
+            <section
+              id="caja"
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div
+                class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-emerald-200/80"
+                  >
+                    Caja y pagos
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Control de caja en vivo
+                  </h3>
+                </div>
+                <div class="flex flex-wrap gap-2 text-sm">
+                  <span
+                    class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-300"
+                    >Efectivo</span
+                  >
+                  <span
+                    class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-300"
+                    >Transferencia</span
+                  >
+                  <span
+                    class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-300"
+                    >Tarjeta</span
+                  >
+                </div>
+              </div>
+              <div class="mt-5 grid gap-4 lg:grid-cols-3">
+                <div
+                  class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4"
+                >
+                  <p class="text-sm text-emerald-100/80">Ingresos del día</p>
+                  <p
+                    id="cash-income-total"
+                    class="mt-3 text-3xl font-semibold text-white"
+                  >
+                    $ 0
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4"
+                >
+                  <p class="text-sm text-amber-100/80">Pendientes</p>
+                  <p
+                    id="cash-pending-total"
+                    class="mt-3 text-3xl font-semibold text-white"
+                  >
+                    $ 0
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4"
+                >
+                  <p class="text-sm text-rose-100/80">Cancelados</p>
+                  <p
+                    id="cash-cancelled-total"
+                    class="mt-3 text-3xl font-semibold text-white"
+                  >
+                    $ 0
+                  </p>
+                </div>
+              </div>
+              <div
+                class="mt-5 overflow-hidden rounded-3xl border border-white/10"
+              >
+                <div
+                  class="grid grid-cols-[1.15fr_1fr_0.85fr_0.8fr_0.7fr] gap-3 border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+                >
+                  <span>Miembro</span><span>Membresía</span><span>Método</span
+                  ><span>Total</span><span>Estado</span>
+                </div>
+                <div id="payments-registry" class="bg-white/[0.02] p-2">
+                  <div
+                    class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                  >
+                    Aún no hay movimientos de caja registrados
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="mt-6 grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
+            <section
+              id="miembros"
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div
+                class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-sky-200/80"
+                  >
+                    Gestión de usuarios
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Miembros, administradores y entrenadores
+                  </h3>
+                </div>
+                <div
+                  id="registers-total"
+                  class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-slate-300"
+                >
+                  0 Registros Totales
+                </div>
+              </div>
+              <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Admins</p>
+                  <p
+                    id="admins-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Entrenadores</p>
+                  <p
+                    id="trainers-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Miembros</p>
+                  <p
+                    id="members-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+              <div
+                class="mt-5 overflow-hidden rounded-3xl border border-white/10"
+              >
+                <div
+                  class="grid grid-cols-[1.05fr_1fr_0.8fr_0.85fr_0.8fr] gap-3 border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+                >
+                  <span>Usuario</span><span>Correo</span><span>Rol</span
+                  ><span>Documento</span><span>Estado</span>
+                </div>
+                <div id="users-registry" class="bg-white/[0.02] p-2">
+                  <div
+                    class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                  >
+                    Aún no hay usuarios registrados en este panel
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-cyan-200/80"
+                  >
+                    Creación de usuarios
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Crear Admin o Entrenador
+                  </h3>
+                </div>
+                <span
+                  class="rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-xs font-medium text-rose-200"
+                  >Solo Admin ⚠️</span
+                >
+              </div>
+              <form class="mt-5 space-y-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-name"
+                      >Nombre</label
+                    >
+                    <input
+                      id="admin-user-name"
+                      type="text"
+                      placeholder="Nombre completo"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-email"
+                      >Correo</label
+                    >
+                    <input
+                      id="admin-user-email"
+                      type="email"
+                      placeholder="correo@gym.com"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-phone"
+                      >Teléfono</label
+                    >
+                    <input
+                      id="admin-user-phone"
+                      type="text"
+                      placeholder="300 000 0000"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-document"
+                      >Documento</label
+                    >
+                    <input
+                      id="admin-user-document"
+                      type="text"
+                      placeholder="Número de documento"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-[1fr_0.75fr]">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-password"
+                      >Contraseña</label
+                    >
+                    <input
+                      id="admin-user-password"
+                      type="password"
+                      placeholder="Contraseña segura"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="admin-user-role"
+                      >Rol</label
+                    >
+                    <select
+                      id="admin-user-role"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    >
+                      <option class="bg-slate-900">Admin</option>
+                      <option class="bg-slate-900">Entrenador</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="admin-user-specialty"
+                    >Especialidad del entrenador</label
+                  >
+                  <input
+                    id="admin-user-specialty"
+                    type="text"
+                    placeholder="Solo si el rol es Entrenador"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <button
+                  class="w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:brightness-105"
+                >
+                  Crear usuario administrativo
+                </button>
+              </form>
+            </section>
+          </div>
+          <div class="mt-6 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+            <section
+              id="membresias"
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-violet-200/80">
+                Planes del gym
+              </p>
+              <h3 class="mt-3 text-2xl font-semibold text-white">
+                Crear membresías
+              </h3>
+              <form class="mt-5 space-y-4">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-name"
+                    >Nombre del plan</label
+                  >
+                  <input
+                    id="membership-name"
+                    type="text"
+                    placeholder="Premium, Full, Semanal..."
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="grid gap-4 sm:grid-cols-3">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-duration"
+                      >Duración</label
+                    >
+                    <input
+                      id="membership-duration"
+                      type="number"
+                      placeholder="30"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-category"
+                      >Categoría</label
+                    >
+                    <input
+                      id="membership-category"
+                      type="text"
+                      placeholder="Premium"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-price"
+                      >Precio</label
+                    >
+                    <input
+                      id="membership-price"
+                      type="number"
+                      placeholder="120000"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-benefits"
+                    >Beneficios</label
+                  >
+                  <textarea
+                    id="membership-benefits"
+                    rows="4"
+                    placeholder="Acceso libre, clases grupales, seguimiento..."
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  ></textarea>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-description"
+                    >Descripción</label
+                  >
+                  <textarea
+                    id="membership-description"
+                    rows="4"
+                    placeholder="Detalle general del plan"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  ></textarea>
+                </div>
+                <button
+                  class="w-full rounded-2xl bg-gradient-to-r from-violet-400 via-fuchsia-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:-translate-y-0.5 hover:brightness-105"
+                >
+                  Guardar membresía
+                </button>
+              </form>
+              <div
+                class="mt-5 overflow-hidden rounded-3xl border border-white/10"
+              >
+                <div
+                  class="border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+                >
+                  Registro de membresías creadas
+                </div>
+                <div id="memberships-registry" class="bg-white/[0.02] p-2">
+                  <div
+                    class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                  >
+                    Ninguna membresia creada actualmente
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section
+              id="agenda"
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div
+                class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-amber-200/80"
+                  >
+                    Agenda y sesiones
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Programación de entrenadores
+                  </h3>
+                </div>
+                <span
+                  class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+                  >trainingSession</span
+                >
+              </div>
+              <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                <div class="rounded-3xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm font-medium text-white">Sesiones de hoy</p>
+                  <div class="mt-4 space-y-3">
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/[0.03] p-3"
+                    >
+                      <div class="flex items-center justify-between">
+                        <p class="font-medium text-white">
+                          Sin sesiones registradas
+                        </p>
+                        <span class="text-sm text-slate-300">0</span>
+                      </div>
+                      <p class="mt-2 text-sm text-slate-400">
+                        Aquí se mostrarán las sesiones creadas en el programa.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-400/10 to-transparent p-4"
+                >
+                  <p class="text-sm font-medium text-white">Radar operativo</p>
+                  <div class="mt-4 space-y-3">
+                    <div
+                      class="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p class="text-sm text-slate-400">
+                        Entrenadores ocupados
+                      </p>
+                      <p
+                        id="busy-trainers-count"
+                        class="mt-2 text-3xl font-semibold text-white"
+                      >
+                        0
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p class="text-sm text-slate-400">
+                        Pendientes de asignar
+                      </p>
+                      <p
+                        id="pending-assignments-count"
+                        class="mt-2 text-3xl font-semibold text-white"
+                      >
+                        0
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p class="text-sm text-slate-400">
+                        Entrenador con más sesiones
+                      </p>
+                      <p
+                        id="top-trainer-name"
+                        class="mt-2 text-lg font-semibold text-white"
+                      >
+                        Sin datos
+                      </p>
+                      <p class="mt-2 text-sm text-slate-400">
+                        Se actualiza con el historial de sesiones.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
