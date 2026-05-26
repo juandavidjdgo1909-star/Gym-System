@@ -10,6 +10,38 @@ body {
   text-rendering: geometricPrecision;
 }
 
+@media (min-width: 1024px) {
+  .dashboard-shell {
+    align-items: stretch !important;
+  }
+
+  .dashboard-sidebar {
+    height: calc(100vh - 2rem) !important;
+    min-height: calc(100vh - 2rem) !important;
+    overflow: hidden !important;
+  }
+
+  .dashboard-sidebar nav {
+    flex: 1 1 auto !important;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.2rem;
+  }
+
+  .dashboard-sidebar nav::-webkit-scrollbar {
+    width: 0.35rem;
+  }
+
+  .dashboard-sidebar nav::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.28);
+    border-radius: 999px;
+  }
+
+  .dashboard-sidebar > div:last-child {
+    margin-top: 1rem !important;
+  }
+}
+
 ::selection {
   background: rgb(190, 242, 100);
   color: rgb(9, 9, 11);
