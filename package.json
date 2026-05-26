@@ -1,0 +1,32 @@
+{
+  "name": "gym-system",
+  "version": "1.0.0",
+  "description": "Sistema web para gestion de gimnasio con paneles de admin, entrenador y miembro.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node ./node_modules/tailwindcss/lib/cli.js -i ./client/css/input.css -o ./client/css/output.css",
+    "dev": "nodemon server.js",
+    "check": "node --check app.js && node --check server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": ["gym", "express", "mongoose", "dashboard"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.4.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^3.4.19",
+    "nodemon": "^3.1.14"
+  }
+}

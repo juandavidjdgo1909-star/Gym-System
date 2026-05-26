@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym-System | Dashboard Admin</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link href="./css/output.css?v=responsive-8" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-[#020617] text-white">
+    <!-- Boton superior usado en celular/tablet para abrir el menu. -->
+    <div
+      id="admin-toast"
+      class="pointer-events-none fixed right-4 top-4 z-50 hidden max-w-sm rounded-2xl border border-white/10 bg-slate-900/95 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-xl"
+    ></div>
+    <div
+      id="export-modal"
+      class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-950/80 px-4 backdrop-blur-xl"
+    >
+      <div
+        class="w-full max-w-md rounded-[28px] border border-white/10 bg-slate-900/95 p-5 shadow-2xl shadow-cyan-950/40"
+      >
+        <div class="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
+              Exportar a Excel
+            </p>
+            <h3 class="mt-2 text-2xl font-semibold text-white">
+              Que quieres exportar?
+            </h3>
+          </div>
+          <button
+            id="export-close"
+            class="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/[0.08]"
+            type="button"
+          >
+            Cerrar
+          </button>
+        </div>
+        <div class="mt-5 grid gap-3">
+          <button
+            class="rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-3 text-left text-sm font-semibold text-sky-100 transition hover:-translate-y-0.5 hover:bg-sky-400/20"
+            data-export="users"
+            type="button"
+          >
+            Usuarios activos
+          </button>
+          <button
+            class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-left text-sm font-semibold text-emerald-100 transition hover:-translate-y-0.5 hover:bg-emerald-400/20"
+            data-export="sales"
+            type="button"
+          >
+            Ventas registradas
+          </button>
+          <button
+            class="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-left text-sm font-semibold text-amber-100 transition hover:-translate-y-0.5 hover:bg-amber-400/20"
+            data-export="trainers"
+            type="button"
+          >
+            Entrenadores activos
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout principal del dashboard administrador. -->
+    <main
+      class="relative min-h-screen overflow-x-hidden bg-[#020617]"
+      style="
+        background-image:
+          linear-gradient(135deg, rgba(2, 6, 23, 0.82), rgba(15, 23, 42, 0.56)),
+          url(./img/gym-admin.jpg);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      "
+    >
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(96,165,250,0.16),transparent_20%),radial-gradient(circle_at_50%_82%,rgba(59,130,246,0.12),transparent_26%),radial-gradient(circle_at_88%_72%,rgba(16,185,129,0.08),transparent_18%)]"
+      ></div>
+      <div
+        class="pointer-events-none absolute inset-0 opacity-70 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[size:53px_53px]"
+      ></div>
+      <div
+        class="pointer-events-none absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-cyan-400/14 blur-3xl"
+      ></div>
+      <div
+        class="pointer-events-none absolute right-[-10%] top-[12%] h-[24rem] w-[24rem] rounded-full bg-blue-500/14 blur-3xl"
+      ></div>
+      <div
+        class="pointer-events-none absolute bottom-[-12%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-emerald-400/12 blur-3xl"
+      ></div>
+      <div
+        class="mobile-topbar relative z-20 mx-auto hidden max-w-[1600px] px-3 pt-3"
+      >
+        <button
+          class="mobile-menu-toggle inline-flex w-full items-center justify-between rounded-2xl border border-sky-400/20 bg-slate-950/80 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-sky-100 shadow-2xl shadow-slate-950/30 backdrop-blur-xl"
+          type="button"
+        >
+          <span>Gym-System</span>
+          <span>Menu</span>
+        </button>
+      </div>
+      <div
+        class="dashboard-shell relative z-10 mx-auto flex min-h-screen max-w-[1600px] items-start gap-6 px-4 py-4 lg:px-6"
+      >
+        <!-- Sidebar con descripcion, navegacion y sesion del admin. -->
+        <aside
+          class="dashboard-sidebar hidden w-[290px] shrink-0 self-start rounded-[30px] border border-white/10 bg-slate-950/60 p-5 shadow-2xl shadow-cyan-950/30 backdrop-blur-md lg:sticky lg:top-4 lg:flex lg:h-[calc(100vh-2rem)] lg:flex-col"
+        >
+          <div class="border-b border-white/10 pb-5">
+            <span
+              class="inline-flex items-center rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.22em] text-sky-100 transform duration-500 hover:bg-sky-400/20 hover:scale-110"
+              >Gym-System</span
+            >
+            <div
+              class="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-slate-400">
+                Panel del administrador
+              </p>
+              <h1 class="mt-3 text-3xl font-semibold leading-tight text-white">
+                Operación total del gimnasio
+              </h1>
+              <p class="mt-3 text-sm leading-6 text-slate-300">
+                Gestiona usuarios, entrenadores, admins, planes, pagos y la
+                actividad de los miembros desde una sola vista.
+              </p>
+            </div>
+          </div>
+
+          <nav class="mt-6 flex-1 space-y-6">
+            <div>
+              <p
+                class="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500"
+              >
+                Navegación
+              </p>
+              <div class="space-y-2">
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-3 text-sm font-medium text-sky-100"
+                  href="#resumen"
+                  >Resumen</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#usuarios"
+                  >Usuarios</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#membresias"
+                  >Membresías</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#rutinas"
+                  >Rutinas</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#contenido"
+                  >Full información</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#pagos"
+                  >Transferencias y pagos</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#actividad"
+                  >Actividad de miembros</a
+                >
+              </div>
+            </div>
+          </nav>
+
+          <div
+            class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <p id="sidebar-admin-name" class="font-semibold text-white">
+                  Admin
+                </p>
+                <p
+                  id="sidebar-admin-email"
+                  class="mt-1 max-w-[150px] truncate text-sm text-slate-400"
+                  title="admin@gym-system.com"
+                >
+                  admin@gym-system.com
+                </p>
+              </div>
+              <button
+                id="admin-logout"
+                class="shrink-0 whitespace-nowrap rounded-2xl border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-xs font-medium text-rose-200 transition duration-500 hover:border-rose-300/40 hover:bg-rose-400/20 hover:scale-110"
+                type="button"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Contenido principal del panel admin. -->
+        <section
+          class="dashboard-content min-w-0 flex-1 rounded-[30px] border border-white/10 bg-slate-900/55 p-4 shadow-2xl shadow-slate-950/40 backdrop-blur-md sm:p-5 lg:p-6"
+        >
+          <!-- Encabezado y estado general del administrador. -->
+          <header
+            class="rounded-[28px] border border-white/10 bg-gradient-to-r from-white/[0.06] to-white/[0.02] p-5 sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
+            >
+              <div>
+                <p
+                  class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-200/80"
+                >
+                  Dashboard Admin
+                </p>
+                <h2
+                  id="admin-hero-title"
+                  class="mt-3 max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-4xl"
+                >
+                  Centro de control del gimnasio
+                </h2>
+                <p
+                  class="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base"
+                >
+                  Supervisa caja, membresías, entrenadores, reservas y eventos
+                  importantes de los miembros en tiempo real.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button
+                  id="export-open"
+                  class="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-400/20"
+                  type="button"
+                >
+                  Exportar Excel
+                </button>
+                <div
+                  id="admin-status-pill"
+                  class="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100 transform duration-500 hover:bg-emerald-400/20 hover:scale-110"
+                >
+                  Panel operativo activo
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Tarjetas resumen con caja, miembros, entrenadores y planes. -->
+          <section
+            id="resumen"
+            class="mt-5 grid gap-4 md:grid-cols-2 2xl:grid-cols-4"
+          >
+            <article
+              class="rounded-[28px] border border-emerald-400/20 bg-emerald-400/10 px-6 py-6 transform duration-500 hover:bg-emerald-400/20 hover:scale-105"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-emerald-200"
+              >
+                Caja acumulada
+              </p>
+              <p
+                id="summary-revenue"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                $ 0
+              </p>
+              <p
+                id="summary-revenue-caption"
+                class="mt-5 text-sm leading-7 text-emerald-100/80"
+              >
+                Total pagado registrado
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-sky-400/20 bg-sky-400/10 px-6 py-6 transform duration-500 hover:bg-sky-400/20 hover:scale-105"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200"
+              >
+                Miembros activos
+              </p>
+              <p
+                id="summary-active-members"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p
+                id="summary-active-members-caption"
+                class="mt-5 text-sm leading-7 text-sky-100/80"
+              >
+                Con membresía vigente
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-violet-400/20 bg-violet-400/10 px-6 py-6 transform duration-500 hover:bg-violet-400/20 hover:scale-105"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-violet-200"
+              >
+                Entrenadores
+              </p>
+              <p
+                id="summary-trainers"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p
+                id="summary-trainers-caption"
+                class="mt-5 text-sm leading-7 text-violet-100/80"
+              >
+                Perfiles disponibles
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-amber-400/20 bg-amber-400/10 px-6 py-6 transform duration-500 hover:bg-amber-400/20 hover:scale-105"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-amber-200/80"
+              >
+                Membresías activas
+              </p>
+              <p
+                id="summary-memberships"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p
+                id="summary-memberships-caption"
+                class="mt-5 text-sm leading-7 text-amber-100/80"
+              >
+                Planes disponibles para vender
+              </p>
+            </article>
+          </section>
+
+          <!-- Gestion de usuarios y formulario de alta/edicion. -->
+          <section
+            id="usuarios"
+            class="mt-6 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]"
+          >
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div
+                class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-sky-200/80"
+                  >
+                    Gestión de usuarios
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Usuarios, admins y entrenadores
+                  </h3>
+                </div>
+                <span
+                  id="users-summary-pill"
+                  class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+                >
+                  0 registros
+                </span>
+              </div>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Admins</p>
+                  <p
+                    id="admins-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Entrenadores</p>
+                  <p
+                    id="trainers-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Miembros</p>
+                  <p
+                    id="members-count"
+                    class="mt-2 text-3xl font-semibold text-white"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <label
+                  class="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-300"
+                  for="admin-users-search"
+                  >Buscar usuario</label
+                >
+                <input
+                  id="admin-users-search"
+                  type="search"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  placeholder="Nombre, correo, rol, telefono, documento o membresia"
+                />
+              </div>
+
+              <div
+                class="mt-5 overflow-x-auto rounded-3xl border border-white/10"
+              >
+                <div
+                  class="grid grid-cols-[1.15fr_1fr_0.8fr_0.8fr_0.8fr_0.85fr] gap-3 border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+                >
+                  <span>Usuario</span>
+                  <span>Correo</span>
+                  <span>Rol</span>
+                  <span>Teléfono</span>
+                  <span>Membresía</span>
+                  <span>Acciones</span>
+                </div>
+                <div id="users-registry" class="bg-white/[0.02] p-2">
+                  <div
+                    class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                  >
+                    Aún no hay usuarios cargados
+                  </div>
+                </div>
+              </div>
+              <div
+                id="admin-users-pagination"
+                class="mt-3 hidden items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3 text-sm text-slate-300"
+              >
+                <button
+                  id="admin-users-prev"
+                  class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                  type="button"
+                >
+                  Anterior
+                </button>
+                <span id="admin-users-page-info">Pagina 1 de 1</span>
+                <button
+                  id="admin-users-next"
+                  class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                  type="button"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-cyan-200/80"
+                  >
+                    Alta y edición
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Crear admins y entrenadores
+                  </h3>
+                </div>
+                <span
+                  id="user-form-badge"
+                  class="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-100"
+                >
+                  Nuevo usuario
+                </span>
+              </div>
+
+              <!-- Formulario para crear o editar usuarios. -->
+              <form id="user-form" class="mt-5 space-y-4">
+                <input id="user-id" type="hidden" />
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-name"
+                      >Nombre</label
+                    >
+                    <input
+                      id="user-name"
+                      type="text"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="Nombre completo"
+                      required
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-email"
+                      >Correo</label
+                    >
+                    <input
+                      id="user-email"
+                      type="email"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="email@example.com"
+                      required
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-phone"
+                      >Teléfono</label
+                    >
+                    <input
+                      id="user-phone"
+                      type="number"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="300 000 0000"
+                      required
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-document"
+                      >Documento</label
+                    >
+                    <input
+                      id="user-document"
+                      type="number"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="1000000000"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-[0.85fr_1.15fr]">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-role"
+                      >Rol</label
+                    >
+                    <select
+                      id="user-role"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    >
+                      <option value="Miembro" class="bg-slate-900">
+                        Miembro
+                      </option>
+                      <option value="Entrenador" class="bg-slate-900">
+                        Entrenador
+                      </option>
+                      <option value="Admin" class="bg-slate-900">Admin</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="user-password"
+                      >Contraseña</label
+                    >
+                    <input
+                      id="user-password"
+                      type="password"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="Obligatoria al crear"
+                    />
+                  </div>
+                </div>
+
+                <div id="specialty-field" class="space-y-2 hidden">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="user-specialty"
+                    >Especialidad</label
+                  >
+                  <input
+                    id="user-specialty"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Fuerza, yoga, funcional..."
+                  />
+                </div>
+
+                <div class="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    id="user-submit"
+                    type="submit"
+                    class="flex-1 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-500 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-500/30 hover:brightness-105"
+                  >
+                    Crear usuario
+                  </button>
+                  <button
+                    id="user-reset"
+                    type="button"
+                    class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-white transition duration-500 hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-1"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- Gestion de planes y portafolio de membresias. -->
+          <section
+            id="membresias"
+            class="mt-6 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]"
+          >
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-violet-200/80">
+                Planes del gym
+              </p>
+              <h3 class="mt-3 text-2xl font-semibold text-white">
+                Crear y actualizar membresías
+              </h3>
+
+              <!-- Formulario para crear o editar membresias. -->
+              <form id="membership-form" class="mt-5 space-y-4">
+                <input id="membership-id" type="hidden" />
+
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-name"
+                    >Nombre del plan</label
+                  >
+                  <input
+                    id="membership-name"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Premium, Full, Semanal..."
+                    required
+                  />
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-3">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-duration"
+                      >Duración</label
+                    >
+                    <input
+                      id="membership-duration"
+                      type="number"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="30"
+                      required
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-category"
+                      >Categoría</label
+                    >
+                    <input
+                      id="membership-category"
+                      type="text"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="Premium"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                      for="membership-price"
+                      >Precio</label
+                    >
+                    <input
+                      id="membership-price"
+                      type="number"
+                      class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="120000"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-benefits"
+                    >Beneficios</label
+                  >
+                  <textarea
+                    id="membership-benefits"
+                    rows="4"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Acceso libre, clases grupales, seguimiento..."
+                  ></textarea>
+                </div>
+
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="membership-description"
+                    >Descripción</label
+                  >
+                  <textarea
+                    id="membership-description"
+                    rows="4"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Detalle general del plan"
+                  ></textarea>
+                </div>
+
+                <label
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300"
+                >
+                  <input
+                    id="membership-active"
+                    type="checkbox"
+                    class="h-4 w-4 accent-cyan-400"
+                    checked
+                  />
+                  Plan activo para compra
+                </label>
+
+                <div class="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="submit"
+                    class="flex-1 rounded-2xl bg-gradient-to-r from-violet-400 via-fuchsia-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition duration-500 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-violet-500/20 hover:brightness-105"
+                  >
+                    Crear membresía
+                  </button>
+                  <button
+                    id="membership-reset"
+                    type="button"
+                    class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-white transition duration-500 hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-1"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-violet-200/80"
+                  >
+                    Portafolio activo
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Registro de membresías
+                  </h3>
+                </div>
+                <span
+                  id="memberships-summary-pill"
+                  class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+                >
+                  0 planes
+                </span>
+              </div>
+
+              <div id="memberships-registry" class="mt-5 grid gap-4">
+                <div
+                  class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                >
+                  Ninguna membresía creada actualmente
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Editor de ejercicios para rutinas generadas. -->
+          <section
+            id="rutinas"
+            class="mt-6 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]"
+          >
+            <div class="rounded-[28px] border border-cyan-300/20 bg-white/[0.04] p-5">
+              <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">
+                Rutinas del miembro
+              </p>
+              <h3 class="mt-3 text-2xl font-semibold text-white">
+                Crear y actualizar ejercicios
+              </h3>
+              <form id="routine-exercise-form" class="mt-5 space-y-4">
+                <input id="routine-exercise-id" type="hidden" />
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-name">Nombre</label>
+                  <input id="routine-exercise-name" required type="text" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="Curl de biceps, sentadilla..." />
+                </div>
+                <div class="grid gap-4 sm:grid-cols-3">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-gender">Dirigido a</label>
+                    <select id="routine-exercise-gender" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20">
+                      <option class="bg-slate-900">Todos</option>
+                      <option class="bg-slate-900">Hombre</option>
+                      <option class="bg-slate-900">Mujer</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-focus">Zona</label>
+                    <input id="routine-exercise-focus" required type="text" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="Brazo" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-level">Nivel</label>
+                    <select id="routine-exercise-level" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20">
+                      <option class="bg-slate-900">Inicial</option>
+                      <option class="bg-slate-900">Intermedio</option>
+                      <option class="bg-slate-900">Avanzado</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-4">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-goal">Objetivo</label>
+                    <input id="routine-exercise-goal" type="text" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="Fuerza" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-sets">Series</label>
+                    <input id="routine-exercise-sets" min="1" type="number" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="3" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-reps">Reps</label>
+                    <input id="routine-exercise-reps" type="text" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="10-12" />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-rest">Descanso</label>
+                    <input id="routine-exercise-rest" type="text" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="60 segundos" />
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-video">Video URL</label>
+                  <input id="routine-exercise-video" type="url" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="https://www.youtube.com/watch?v=..." />
+                </div>
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium uppercase tracking-wide text-slate-300" for="routine-exercise-technique">Técnica</label>
+                  <textarea id="routine-exercise-technique" rows="3" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20" placeholder="Indicaciones para ejecutar bien el movimiento"></textarea>
+                </div>
+                <label class="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+                  <input id="routine-exercise-active" type="checkbox" class="h-4 w-4 accent-cyan-400" checked />
+                  Ejercicio activo para generar rutinas
+                </label>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                  <button type="submit" class="flex-1 rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-lime-300 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-500 hover:-translate-y-0.5 hover:shadow-2xl hover:brightness-105">Guardar ejercicio</button>
+                  <button id="routine-exercise-reset" type="button" class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06]">Limpiar</button>
+                </div>
+              </form>
+            </div>
+            <div class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">
+                    Biblioteca editable
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Ejercicios y videos
+                  </h3>
+                </div>
+                <span id="routine-exercises-pill" class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">0 ejercicios</span>
+              </div>
+              <div id="routine-exercises-registry" class="mt-5 grid gap-4">
+                <div class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400">
+                  Aún no hay ejercicios configurados.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Edicion del contenido publico de la pantalla inicial. -->
+          <section
+            id="contenido"
+            class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+          >
+            <div
+              class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">
+                  Portada publica
+                </p>
+                <h3 class="mt-3 text-2xl font-semibold text-white">
+                  Editar full información
+                </h3>
+              </div>
+              <span
+                id="site-content-badge"
+                class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-100"
+              >
+                Visible en inicio
+              </span>
+            </div>
+
+            <form id="site-content-form" class="mt-5 space-y-4">
+              <div class="grid gap-4 lg:grid-cols-[0.75fr_1.25fr]">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-eyebrow-input"
+                    >Etiqueta superior</label
+                  >
+                  <input
+                    id="site-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Gym-System"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-hero-title-input"
+                    >Titulo principal</label
+                  >
+                  <input
+                    id="site-hero-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Titulo de la portada"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                  for="site-hero-description-input"
+                  >Descripcion principal</label
+                >
+                <textarea
+                  id="site-hero-description-input"
+                  rows="3"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  placeholder="Texto corto que aparece debajo del titulo"
+                ></textarea>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-2">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-experience-eyebrow-input"
+                    >Etiqueta seccion experiencia</label
+                  >
+                  <input
+                    id="site-experience-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-experience-title-input"
+                    >Titulo seccion experiencia</label
+                  >
+                  <input
+                    id="site-experience-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-plans-eyebrow-input"
+                    >Etiqueta seccion precios</label
+                  >
+                  <input
+                    id="site-plans-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-plans-title-input"
+                    >Titulo seccion precios</label
+                  >
+                  <input
+                    id="site-plans-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-schedule-eyebrow-input"
+                    >Etiqueta horarios</label
+                  >
+                  <input
+                    id="site-schedule-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-full-info-title-input"
+                    >Titulo full informacion</label
+                  >
+                  <input
+                    id="site-full-info-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Full informacion del gimnasio"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-full-info-description-input"
+                    >Texto full informacion</label
+                  >
+                  <textarea
+                    id="site-full-info-description-input"
+                    rows="3"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Descripcion completa del gym, servicios y propuesta"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-3">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-contact-eyebrow-input"
+                    >Etiqueta contacto</label
+                  >
+                  <input
+                    id="site-contact-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2 lg:col-span-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-contact-title-input"
+                    >Titulo contacto</label
+                  >
+                  <input
+                    id="site-contact-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-schedule-input"
+                    >Horario</label
+                  >
+                  <input
+                    id="site-schedule-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Lunes a sabado..."
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-location-input"
+                    >Ubicacion</label
+                  >
+                  <input
+                    id="site-location-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Sede o direccion"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-contact-input"
+                    >Contacto</label
+                  >
+                  <input
+                    id="site-contact-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Correo, telefono o WhatsApp"
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                  for="site-how-it-works-input"
+                  >Texto como funciona</label
+                >
+                <textarea
+                  id="site-how-it-works-input"
+                  rows="3"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                ></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                  for="site-highlights-input"
+                  >Bloques destacados</label
+                >
+                <textarea
+                  id="site-highlights-input"
+                  rows="6"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  placeholder="Etiqueta | Titulo | Descripcion&#10;Planes | Membresias flexibles | Elige el plan ideal..."
+                ></textarea>
+                <p class="text-xs leading-5 text-slate-400">
+                  Escribe un bloque por linea con el formato: Etiqueta | Titulo
+                  | Descripcion.
+                </p>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-2">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-schedule-cards-input"
+                    >Tarjetas de horarios/clases</label
+                  >
+                  <textarea
+                    id="site-schedule-cards-input"
+                    rows="6"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Etiqueta | Titulo | Descripcion"
+                  ></textarea>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-stats-input"
+                    >Metricas del login</label
+                  >
+                  <textarea
+                    id="site-auth-stats-input"
+                    rows="6"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="3 | Roles&#10;1 | Membresias&#10;24/7 | Horas"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-2">
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-title-input"
+                    >Titulo pantalla ingresar</label
+                  >
+                  <textarea
+                    id="site-auth-title-input"
+                    rows="3"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  ></textarea>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-description-input"
+                    >Descripcion pantalla ingresar</label
+                  >
+                  <textarea
+                    id="site-auth-description-input"
+                    rows="3"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  ></textarea>
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-badge-input"
+                    >Etiqueta pantalla ingresar</label
+                  >
+                  <input
+                    id="site-auth-badge-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-login-title-input"
+                    >Titulo caja login</label
+                  >
+                  <input
+                    id="site-auth-login-title-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-login-eyebrow-input"
+                    >Etiqueta caja login</label
+                  >
+                  <input
+                    id="site-auth-login-eyebrow-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label
+                    class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                    for="site-auth-login-description-input"
+                    >Descripcion caja login</label
+                  >
+                  <input
+                    id="site-auth-login-description-input"
+                    type="text"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-xs font-medium uppercase tracking-wide text-slate-300"
+                  for="site-auth-cards-input"
+                  >Tarjetas pantalla ingresar</label
+                >
+                <textarea
+                  id="site-auth-cards-input"
+                  rows="6"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                  placeholder="Etiqueta | Titulo | Descripcion"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-500 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-500/30 hover:brightness-105 sm:w-auto"
+              >
+                Guardar contenido
+              </button>
+            </form>
+          </section>
+
+          <!-- Historial financiero del gimnasio. -->
+          <section
+            id="pagos"
+            class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+          >
+            <div
+              class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p
+                  class="text-xs uppercase tracking-[0.28em] text-emerald-200/80"
+                >
+                  Caja y transferencias
+                </p>
+                <h3 class="mt-3 text-2xl font-semibold text-white">
+                  Historial de pagos realizados
+                </h3>
+              </div>
+              <span
+                id="payments-summary-pill"
+                class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+              >
+                0 movimientos
+              </span>
+            </div>
+
+            <div class="mt-5 grid gap-4 lg:grid-cols-3">
+              <div
+                class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 hover:brightness-105"
+              >
+                <p class="text-sm text-emerald-100/80">Pagados</p>
+                <p
+                  id="paid-payments-total"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  $ 0
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/20 hover:brightness-105"
+              >
+                <p class="text-sm text-amber-100/80">Pendientes</p>
+                <p
+                  id="pending-payments-total"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  $ 0
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-rose-500/20 hover:brightness-105"
+              >
+                <p class="text-sm text-rose-100/80">Cancelados</p>
+                <p
+                  id="cancelled-payments-total"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  $ 0
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 rounded-3xl border border-white/10 bg-black/20 p-4"
+            >
+              <label
+                class="block text-xs font-medium uppercase tracking-[0.22em] text-slate-300"
+                for="payment-invoice-search"
+                >Buscar por ID de factura</label
+              >
+              <input
+                id="payment-invoice-search"
+                type="search"
+                class="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
+                placeholder="Ej: FAC-A1B2C3"
+              />
+            </div>
+
+            <div
+              class="mt-5 overflow-x-auto rounded-3xl border border-white/10"
+            >
+              <div
+                class="grid grid-cols-[0.85fr_1.05fr_1fr_0.75fr_0.8fr_0.75fr_0.75fr] gap-3 border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+              >
+                <span>Factura</span>
+                <span>Miembro</span>
+                <span>Membresía</span>
+                <span>Método</span>
+                <span>Total</span>
+                <span>Estado</span>
+                <span>Fecha</span>
+              </div>
+              <div id="payments-registry" class="bg-white/[0.02] p-2">
+                <div
+                  class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                >
+                  Aún no hay movimientos de caja registrados
+                </div>
+              </div>
+            </div>
+            <div
+              id="payments-pagination"
+              class="mt-3 hidden items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3 text-sm text-slate-300"
+            >
+              <button
+                id="payments-prev"
+                class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                type="button"
+              >
+                Anterior
+              </button>
+              <span id="payments-page-info">Pagina 1 de 1</span>
+              <button
+                id="payments-next"
+                class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                type="button"
+              >
+                Siguiente
+              </button>
+            </div>
+          </section>
+
+          <!-- Actividad consolidada de miembros. -->
+          <section
+            id="actividad"
+            class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+          >
+            <div
+              class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p
+                  class="text-xs uppercase tracking-[0.28em] text-amber-200/80"
+                >
+                  Historial de miembros
+                </p>
+                <h3 class="mt-3 text-2xl font-semibold text-white">
+                  Acciones clave del sistema
+                </h3>
+              </div>
+              <span
+                id="activity-summary-pill"
+                class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+              >
+                0 eventos
+              </span>
+            </div>
+
+            <div class="mt-5 grid gap-4 lg:grid-cols-3">
+              <div
+                class="rounded-2xl border border-white/10 bg-black/20 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:brightness-105"
+              >
+                <p class="text-sm text-slate-400">Compras de membresía</p>
+                <p
+                  id="activity-purchases-count"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  0
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-black/20 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:brightness-105"
+              >
+                <p class="text-sm text-slate-400">Reservas con entrenador</p>
+                <p
+                  id="activity-bookings-count"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  0
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-black/20 p-4 transition duration-500 hover:scale-105 hover:shadow-2xl hover:brightness-105"
+              >
+                <p class="text-sm text-slate-400">Vencidas/canceladas</p>
+                <p
+                  id="activity-expired-count"
+                  class="mt-2 text-3xl font-semibold text-white"
+                >
+                  0
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 overflow-x-auto rounded-3xl border border-white/10"
+            >
+              <div
+                class="grid grid-cols-[0.9fr_1.6fr_0.9fr_0.8fr] gap-3 border-b border-white/10 bg-black/20 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
+              >
+                <span>Miembro</span>
+                <span>Acción</span>
+                <span>Fecha</span>
+                <span>Tipo</span>
+              </div>
+              <div id="activity-registry" class="bg-white/[0.02] p-2">
+                <div
+                  class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400"
+                >
+                  Aún no hay actividad consolidada
+                </div>
+              </div>
+            </div>
+            <div
+              id="activity-pagination"
+              class="mt-3 hidden items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3 text-sm text-slate-300"
+            >
+              <button
+                id="activity-prev"
+                class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                type="button"
+              >
+                Anterior
+              </button>
+              <span id="activity-page-info">Pagina 1 de 1</span>
+              <button
+                id="activity-next"
+                class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/[0.06]"
+                type="button"
+              >
+                Siguiente
+              </button>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+    <script src="./js/dashboardAdmin.js"></script>
+    <script src="./js/responsiveMenu.js"></script>
+  </body>
+</html>

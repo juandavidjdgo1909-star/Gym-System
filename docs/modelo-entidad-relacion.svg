@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="48%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#083344"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </linearGradient>
+    <linearGradient id="cardHead" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#075985"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="dotBlue" markerWidth="11" markerHeight="11" refX="5.5" refY="5.5">
+      <circle cx="5.5" cy="5.5" r="4.5" fill="#38bdf8"/>
+    </marker>
+    <marker id="dotGreen" markerWidth="11" markerHeight="11" refX="5.5" refY="5.5">
+      <circle cx="5.5" cy="5.5" r="4.5" fill="#34d399"/>
+    </marker>
+    <marker id="dotAmber" markerWidth="11" markerHeight="11" refX="5.5" refY="5.5">
+      <circle cx="5.5" cy="5.5" r="4.5" fill="#fbbf24"/>
+    </marker>
+    <style>
+      .title { fill: #f8fafc; font: 900 52px Arial, sans-serif; letter-spacing: 1px; }
+      .subtitle { fill: #bae6fd; font: 500 19px Arial, sans-serif; }
+      .section { fill: #67e8f9; font: 900 16px Arial, sans-serif; letter-spacing: 4px; }
+      .card { fill: url(#card); stroke: rgba(125,211,252,.76); stroke-width: 2.2; filter: url(#shadow); }
+      .head { fill: url(#cardHead); opacity: .34; }
+      .entity { fill: #f8fafc; font: 900 24px Arial, sans-serif; letter-spacing: 1.2px; }
+      .field { fill: #dbeafe; font: 500 15px Arial, sans-serif; }
+      .muted { fill: #94a3b8; font: 500 14px Arial, sans-serif; }
+      .pk { fill: #fde047; font: 900 15px Arial, sans-serif; }
+      .fk { fill: #67e8f9; font: 900 15px Arial, sans-serif; }
+      .embed { fill: #86efac; font: 900 15px Arial, sans-serif; }
+      .rel-user { stroke: #38bdf8; marker-start: url(#dotBlue); marker-end: url(#dotBlue); }
+      .rel-plan { stroke: #34d399; marker-start: url(#dotGreen); marker-end: url(#dotGreen); }
+      .rel-trainer { stroke: #fbbf24; marker-start: url(#dotAmber); marker-end: url(#dotAmber); }
+      .rel { stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: .95; }
+      .box { fill: #020617; stroke: rgba(226,232,240,.35); stroke-width: 1.4; }
+      .label { fill: #f8fafc; font: 900 14px Arial, sans-serif; }
+      .legend { fill: rgba(15,23,42,.9); stroke: rgba(148,163,184,.38); stroke-width: 1.6; }
+      .legendText { fill: #cbd5e1; font: 500 16px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <path d="M0 150H1920M0 330H1920M0 510H1920M0 690H1920M0 870H1920M160 0V1080M320 0V1080M480 0V1080M640 0V1080M800 0V1080M960 0V1080M1120 0V1080M1280 0V1080M1440 0V1080M1600 0V1080M1760 0V1080" stroke="#1e293b" stroke-width="1" opacity=".23"/>
+
+  <rect x="70" y="44" width="1780" height="108" rx="28" fill="rgba(2,6,23,.45)" stroke="rgba(56,189,248,.18)"/>
+  <text x="105" y="100" class="title">Modelo Entidad-Relacion</text>
+  <text x="108" y="132" class="subtitle">Gym System | Diagrama organizado para exposicion con entidades, llaves y relaciones principales</text>
+
+  <text x="105" y="202" class="section">USUARIOS</text>
+  <text x="760" y="202" class="section">ENTIDADES PUENTE</text>
+  <text x="1440" y="202" class="section">CATALOGO</text>
+
+  <!-- USER -->
+  <rect x="80" y="230" width="420" height="480" rx="26" class="card"/>
+  <rect x="80" y="230" width="420" height="62" rx="26" class="head"/>
+  <text x="115" y="270" class="entity">USER</text>
+  <text x="115" y="320" class="pk">PK _id</text>
+  <text x="115" y="352" class="field">name</text>
+  <text x="115" y="382" class="field">email unique</text>
+  <text x="115" y="412" class="field">phone unique</text>
+  <text x="115" y="442" class="field">document unique</text>
+  <text x="115" y="472" class="field">password</text>
+  <text x="115" y="502" class="field">rol: Admin | Miembro | Entrenador</text>
+  <text x="115" y="532" class="field">isActive</text>
+  <text x="115" y="562" class="muted">createdAt / updatedAt</text>
+  <line x1="115" y1="590" x2="465" y2="590" stroke="#334155" stroke-width="2"/>
+  <text x="115" y="623" class="embed">trainerSheet embebida</text>
+  <text x="115" y="655" class="field">age, initialWeight, height</text>
+  <text x="115" y="685" class="field">availability, goal, medicalNotes</text>
+
+  <!-- TRAINER PROFILE -->
+  <rect x="80" y="820" width="420" height="170" rx="26" class="card"/>
+  <rect x="80" y="820" width="420" height="62" rx="26" class="head"/>
+  <text x="115" y="860" class="entity">TRAINER PROFILE</text>
+  <text x="115" y="915" class="pk">PK _id</text>
+  <text x="115" y="950" class="fk">FK user -> User._id</text>
+  <text x="115" y="980" class="field">specialty</text>
+
+  <!-- SUBSCRIPTION -->
+  <rect x="750" y="230" width="420" height="285" rx="26" class="card"/>
+  <rect x="750" y="230" width="420" height="62" rx="26" class="head"/>
+  <text x="785" y="270" class="entity">SUBSCRIPTION</text>
+  <text x="785" y="320" class="pk">PK _id</text>
+  <text x="785" y="355" class="fk">FK user -> User._id</text>
+  <text x="785" y="390" class="fk">FK membership -> Membership._id</text>
+  <text x="785" y="425" class="field">startDate, endDate</text>
+  <text x="785" y="458" class="field">status: Activa | Expirada | Cancelada</text>
+
+  <!-- PAYMENT -->
+  <rect x="750" y="560" width="420" height="305" rx="26" class="card"/>
+  <rect x="750" y="560" width="420" height="62" rx="26" class="head"/>
+  <text x="785" y="600" class="entity">PAYMENT</text>
+  <text x="785" y="650" class="pk">PK _id</text>
+  <text x="785" y="685" class="fk">FK user -> User._id</text>
+  <text x="785" y="720" class="fk">FK membership -> Membership._id</text>
+  <text x="785" y="755" class="field">amount</text>
+  <text x="785" y="785" class="field">method: Tarjeta | Transferencia | Efectivo</text>
+  <text x="785" y="815" class="field">status: Pendiente | Pagado | Cancelado</text>
+  <text x="785" y="845" class="field">paymentDate</text>
+
+  <!-- TRAINING SESSION -->
+  <rect x="750" y="905" width="420" height="130" rx="26" class="card"/>
+  <rect x="750" y="905" width="420" height="52" rx="26" class="head"/>
+  <text x="785" y="940" class="entity">TRAINING SESSION</text>
+  <text x="785" y="980" class="pk">PK _id</text>
+  <text x="930" y="980" class="fk">FK trainer -> User._id</text>
+  <text x="930" y="1010" class="fk">FK member -> User._id</text>
+  <text x="785" y="1010" class="field">date, hour, status, cancelReason</text>
+
+  <!-- MEMBERSHIP -->
+  <rect x="1420" y="300" width="420" height="380" rx="26" class="card"/>
+  <rect x="1420" y="300" width="420" height="62" rx="26" class="head"/>
+  <text x="1455" y="340" class="entity">MEMBERSHIP</text>
+  <text x="1455" y="395" class="pk">PK _id</text>
+  <text x="1455" y="430" class="field">name</text>
+  <text x="1455" y="460" class="field">durationInDays</text>
+  <text x="1455" y="490" class="field">category</text>
+  <text x="1455" y="520" class="field">price</text>
+  <text x="1455" y="550" class="field">benefits[]</text>
+  <text x="1455" y="580" class="field">description</text>
+  <text x="1455" y="610" class="field">isActive</text>
+  <text x="1455" y="640" class="muted">createdAt / updatedAt</text>
+
+  <!-- CLEAN RELATION LANES -->
+  <!-- User to Subscription -->
+  <path class="rel rel-user" d="M500 355 H750"/>
+  <rect x="600" y="333" width="70" height="32" rx="10" class="box"/>
+  <text x="616" y="355" class="label">1:N</text>
+
+  <!-- Membership to Subscription -->
+  <path class="rel rel-plan" d="M1170 390 H1420"/>
+  <rect x="1260" y="368" width="70" height="32" rx="10" class="box"/>
+  <text x="1276" y="390" class="label">1:N</text>
+
+  <!-- User to Payment -->
+  <path class="rel rel-user" d="M500 685 H750"/>
+  <rect x="600" y="663" width="70" height="32" rx="10" class="box"/>
+  <text x="616" y="685" class="label">1:N</text>
+
+  <!-- Membership to Payment -->
+  <path class="rel rel-plan" d="M1420 560 H1170"/>
+  <rect x="1260" y="538" width="70" height="32" rx="10" class="box"/>
+  <text x="1276" y="560" class="label">1:N</text>
+
+  <!-- User to TrainerProfile -->
+  <path class="rel rel-trainer" d="M290 710 V820"/>
+  <rect x="240" y="755" width="100" height="32" rx="10" class="box"/>
+  <text x="252" y="777" class="label">1:0..1</text>
+
+  <!-- User to TrainingSession as trainer/member, routed below everything -->
+  <path class="rel rel-trainer" d="M500 625 H560 V930 H750"/>
+  <rect x="578" y="908" width="130" height="32" rx="10" class="box"/>
+  <text x="592" y="930" class="label">trainer 1:N</text>
+
+  <path class="rel rel-user" d="M500 655 H610 V1000 H750"/>
+  <rect x="578" y="980" width="130" height="32" rx="10" class="box"/>
+  <text x="594" y="1002" class="label">member 1:N</text>
+
+  <!-- LEGEND -->
+  <rect x="1280" y="820" width="560" height="170" rx="24" class="legend"/>
+  <text x="1310" y="858" class="section">LEYENDA</text>
+  <text x="1310" y="895" class="legendText">PK: llave primaria</text>
+  <text x="1310" y="925" class="legendText">FK: llave foranea</text>
+  <text x="1310" y="955" class="legendText">Azul: relaciones con User</text>
+  <text x="1560" y="955" class="legendText">Verde: relaciones con Membership</text>
+  <text x="1310" y="985" class="legendText">Amarillo: relacion de perfil o entrenador</text>
+</svg>

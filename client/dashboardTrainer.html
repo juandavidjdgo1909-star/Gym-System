@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym-System | Dashboard Entrenador</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link href="./css/output.css?v=responsive-7" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-[#020617] text-white">
+    <!-- Boton superior usado en celular/tablet para abrir el menu. -->
+    <div
+      id="trainer-toast"
+      class="fixed right-4 top-4 z-50 hidden max-w-sm rounded-2xl border px-4 py-3 text-sm shadow-2xl backdrop-blur-xl"
+    ></div>
+    <!-- Layout principal del dashboard del entrenador. -->
+    <main
+      class="relative min-h-screen overflow-x-hidden bg-[#020617]"
+      style="background-image: linear-gradient(135deg, rgba(2, 6, 23, 0.82), rgba(15, 23, 42, 0.56)), url('./img/gym-trainer.jpg'); background-size: cover; background-position: center; background-attachment: fixed;"
+    >
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_18%,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(96,165,250,0.16),transparent_20%),radial-gradient(circle_at_50%_82%,rgba(59,130,246,0.12),transparent_26%),radial-gradient(circle_at_88%_72%,rgba(16,185,129,0.08),transparent_18%)]"
+      ></div>
+      <div
+        class="pointer-events-none absolute inset-0 opacity-70 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[size:53px_53px]"
+      ></div>
+      <div
+        class="pointer-events-none absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-cyan-400/14 blur-3xl"
+      ></div>
+      <div
+        class="pointer-events-none absolute right-[-10%] top-[12%] h-[24rem] w-[24rem] rounded-full bg-blue-500/14 blur-3xl"
+      ></div>
+      <div
+        class="pointer-events-none absolute bottom-[-12%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-emerald-400/12 blur-3xl"
+      ></div>
+      <div class="mobile-topbar relative z-20 mx-auto hidden max-w-[1600px] px-3 pt-3">
+        <button
+          class="mobile-menu-toggle inline-flex w-full items-center justify-between rounded-2xl border border-sky-400/20 bg-slate-950/80 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-sky-100 shadow-2xl shadow-slate-950/30 backdrop-blur-xl"
+          type="button"
+        >
+          <span>Gym-System</span>
+          <span>Menu</span>
+        </button>
+      </div>
+      <div
+        class="dashboard-shell relative z-10 mx-auto flex min-h-screen max-w-[1600px] items-start gap-6 px-4 py-4 lg:px-6"
+      >
+        <!-- Sidebar con navegacion y sesion del entrenador. -->
+        <aside
+          class="dashboard-sidebar hidden w-[290px] shrink-0 self-start rounded-[30px] border border-white/10 bg-slate-950/60 p-5 shadow-2xl shadow-sky-950/30 backdrop-blur-md lg:sticky lg:top-4 lg:flex lg:flex-col"
+        >
+          <div class="border-b border-white/10 pb-5">
+            <span
+              class="inline-flex items-center rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.22em] text-sky-100 transition duration-500 hover:bg-sky-400/20 hover:scale-110"
+              >Gym-System</span
+            >
+            <div
+              class="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-slate-400">
+                Panel del entrenador
+              </p>
+              <h1 class="mt-3 text-3xl font-semibold leading-tight text-white">
+                Tu agenda, tus miembros y tu pago
+              </h1>
+              <p class="mt-3 text-sm leading-6 text-slate-300">
+                Consulta cuándo recibirás tu próximo pago y revisa los miembros
+                que están solicitando entrenador.
+              </p>
+            </div>
+          </div>
+
+          <nav class="mt-6 space-y-6">
+            <div>
+              <p
+                class="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500"
+              >
+                Navegación
+              </p>
+              <div class="space-y-2">
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:-translate-y-0.5 hover:brightness-105"
+                  href="#resumen"
+                  >Resumen</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#pago"
+                  >Pago</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#solicitudes"
+                  >Solicitudes</a
+                >
+                <a
+                  class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  href="#miembro-detalle"
+                  >Detalle miembro</a
+                >
+              </div>
+            </div>
+          </nav>
+
+          <div
+            class="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-4"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p id="sidebar-trainer-name" class="font-semibold text-white">
+                  Entrenador
+                </p>
+                <p
+                  id="sidebar-trainer-email"
+                  class="mt-1 max-w-[130px] truncate text-sm text-slate-400"
+                >
+                  Panel de seguimiento
+                </p>
+              </div>
+              <button
+                id="trainer-logout"
+                class="shrink-0 whitespace-nowrap rounded-2xl border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-xs font-medium text-rose-200 transition hover:-translate-y-0.5 hover:border-rose-300/40 hover:bg-rose-400/30"
+                type="button"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Contenido principal del panel del entrenador. -->
+        <section
+          class="dashboard-content min-w-0 flex-1 rounded-[30px] border border-white/10 bg-slate-900/55 p-4 shadow-2xl shadow-slate-950/40 backdrop-blur-md sm:p-5 lg:p-6"
+        >
+          <!-- Encabezado con estado de solicitudes y pagos. -->
+          <header
+            id="resumen"
+            class="rounded-[28px] border border-white/10 bg-gradient-to-r from-white/[0.06] to-white/[0.02] p-5 sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
+            >
+              <div>
+                <p
+                  class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-200/80"
+                >
+                  Dashboard Entrenador
+                </p>
+                <h2
+                  id="trainer-hero-title"
+                  class="mt-3 max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-4xl"
+                >
+                  Controla tus solicitudes y el tiempo de pago
+                </h2>
+                <p
+                  class="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base"
+                >
+                  Acepta o rechaza miembros, revisa su información y mantente al
+                  tanto de tu próximo pago mensual.
+                </p>
+              </div>
+              <div
+                id="requests-hero-pill"
+                class="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100 transition duration-500 hover:bg-emerald-400/20 hover:scale-110"
+              >
+                0 solicitudes
+              </div>
+            </div>
+          </header>
+
+          <!-- Resumen de solicitudes, miembros y proximo pago. -->
+          <section
+            class="mt-5 grid gap-4 md:grid-cols-2 2xl:grid-cols-4"
+          >
+            <article
+              class="rounded-[28px] border border-sky-400/20 bg-sky-400/10 px-6 py-6 transition duration-500 hover:-translate-y-2 hover:border-sky-300/40 hover:shadow-2xl hover:shadow-sky-950/30 hover:bg-sky-400/20"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-200"
+              >
+                Días para pago
+              </p>
+              <p
+                id="days-to-pay"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-sky-100/80">
+                Días para el próximo pago
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-emerald-400/20 bg-emerald-400/10 px-6 py-6 transition duration-500 hover:-translate-y-2 hover:border-emerald-300/40 hover:shadow-2xl hover:shadow-emerald-950/30 hover:bg-emerald-400/20"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-emerald-200"
+              >
+                Miembros activos
+              </p>
+              <p
+                id="members-actives"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-emerald-100/80">
+                Miembros asignados actualmente
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-amber-400/20 bg-amber-400/10 px-6 py-6 transition duration-500 hover:-translate-y-2 hover:border-amber-300/40 hover:shadow-2xl hover:shadow-amber-950/30 hover:bg-amber-400/20"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-amber-200/80"
+              >
+                Solicitudes nuevas
+              </p>
+              <p
+                id="new-solicitudes"
+                class="mt-6 text-5xl font-semibold leading-none text-white"
+              >
+                0
+              </p>
+              <p class="mt-5 text-sm leading-7 text-amber-100/80">
+                Miembros buscando entrenador
+              </p>
+            </article>
+
+            <article
+              class="rounded-[28px] border border-violet-400/20 bg-violet-400/10 px-6 py-6 transition duration-500 hover:-translate-y-2 hover:border-violet-300/40 hover:shadow-2xl hover:shadow-violet-950/30 hover:bg-violet-400/20"
+            >
+              <p
+                class="text-[11px] font-semibold uppercase tracking-[0.32em] text-violet-200"
+              >
+                Próximo pago
+              </p>
+              <p
+                id="date-next-pay"
+                class="mt-6 text-3xl font-semibold leading-tight text-white"
+              >
+                Fecha
+              </p>
+              <p class="mt-5 text-sm leading-7 text-violet-100/80">
+                Fecha del próximo pago
+              </p>
+            </article>
+          </section>
+
+          <!-- Detalle del pago estimado para el entrenador. -->
+          <section id="pago" class="mt-6">
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition duration-300 hover:border-white/20 hover:bg-white/[0.05]"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-sky-200/80"
+                  >
+                    Ciclo de pago
+                  </p>
+                  <h3 class="mt-3 text-2xl font-semibold text-white">
+                    Cuenta regresiva mensual
+                  </h3>
+                </div>
+                <span
+                  class="rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-1 text-xs text-sky-100"
+                >
+                  Ciclo iniciado
+                </span>
+              </div>
+
+              <div
+                class="mt-6 rounded-[26px] border border-sky-400/20 bg-gradient-to-br from-sky-400/10 to-transparent p-5"
+              >
+                <p class="text-sm text-slate-300">Cuenta regresiva</p>
+                <div class="mt-5 grid gap-3 md:grid-cols-4">
+                  <div
+                    class="rounded-3xl border border-sky-300/15 bg-slate-950/40 px-4 py-5 text-center transition duration-500 hover:-translate-y-2 hover:border-sky-200/30 hover:bg-slate-950/60"
+                  >
+                    <p
+                      id="regresive-days"
+                      class="text-5xl font-semibold leading-none text-white sm:text-6xl"
+                    >
+                      30
+                    </p>
+                    <p
+                      class="mt-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-100/80"
+                    >
+                      Días
+                    </p>
+                  </div>
+                  <div
+                    class="rounded-3xl border border-sky-300/15 bg-slate-950/40 px-4 py-5 text-center transition duration-500 hover:-translate-y-2 hover:border-sky-200/30 hover:bg-slate-950/60"
+                  >
+                    <p
+                      id="regresive-hours"
+                      class="text-5xl font-semibold leading-none text-white sm:text-6xl"
+                    >
+                      00
+                    </p>
+                    <p
+                      class="mt-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-100/80"
+                    >
+                      Horas
+                    </p>
+                  </div>
+                  <div
+                    class="rounded-3xl border border-sky-300/15 bg-slate-950/40 px-4 py-5 text-center transition duration-500 hover:-translate-y-2 hover:border-sky-200/30 hover:bg-slate-950/60"
+                  >
+                    <p
+                      id="regresive-minutes"
+                      class="text-5xl font-semibold leading-none text-white sm:text-6xl"
+                    >
+                      00
+                    </p>
+                    <p
+                      class="mt-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-100/80"
+                    >
+                      Minutos
+                    </p>
+                  </div>
+                  <div
+                    class="rounded-3xl border border-sky-300/15 bg-slate-950/40 px-4 py-5 text-center transition duration-500 hover:-translate-y-2 hover:border-sky-200/30 hover:bg-slate-950/60"
+                  >
+                    <p
+                      id="regresive-seconds"
+                      class="text-5xl font-semibold leading-none text-white sm:text-6xl"
+                    >
+                      00
+                    </p>
+                    <p
+                      class="mt-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-sky-100/80"
+                    >
+                      Segundos
+                    </p>
+                  </div>
+                </div>
+                <p
+                  id="next-pay-caption"
+                  class="mt-5 text-sm leading-6 text-slate-300"
+                >
+                  El próximo pago está previsto para el 1 de junio.
+                </p>
+                <div class="mt-5">
+                  <div
+                    class="h-3 overflow-hidden rounded-full bg-slate-950/70 ring-1 ring-white/10"
+                  >
+                    <div
+                      id="payment-progress"
+                      class="h-full w-0 rounded-full bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300 transition-all duration-500"
+                    ></div>
+                  </div>
+                  <div
+                    class="mt-3 flex items-center justify-between text-xs text-slate-400"
+                  >
+                    <span id="payment-cycle-start">Inicio del ciclo</span>
+                    <span id="payment-cycle-end">1 de junio</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Solicitudes pendientes para aceptar o rechazar. -->
+          <section id="solicitudes" class="mt-6">
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5"
+            >
+              <div
+                class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.28em] text-amber-200/80"
+                  >
+                    Miembros buscando entrenador
+                  </p>
+                  <h3
+                    id="requests-title"
+                    class="mt-3 text-2xl font-semibold text-white"
+                  >
+                    0 solicitudes disponibles
+                  </h3>
+                </div>
+                <span
+                  id="requests-section-pill"
+                  class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300"
+                >
+                  0 solicitudes
+                </span>
+              </div>
+
+              <div
+                id="requests-list"
+                class="mt-5 rounded-[26px] border border-dashed border-white/10 bg-black/20 px-6 py-14 text-center"
+              >
+                <p class="text-lg font-semibold text-white">
+                  No hay solicitudes disponibles
+                </p>
+                <p class="mt-3 text-sm leading-6 text-slate-400">
+                  Cuando un miembro solicite entrenador, aparecerá aquí con sus
+                  datos y las opciones para aceptar o rechazar.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Vista ampliada del miembro seleccionado. -->
+          <section
+            id="miembro-detalle"
+            class="mt-6 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]"
+          >
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition duration-300 hover:border-white/20 hover:bg-white/[0.05]"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-violet-200/80">
+                Perfil del miembro
+              </p>
+              <h3 class="mt-3 text-2xl font-semibold text-white">
+                Información general
+              </h3>
+
+              <div
+                class="mt-5 rounded-[26px] border border-white/10 bg-black/20 p-5"
+              >
+                <div class="flex items-center gap-4">
+                  <div
+                    id="member-avatar"
+                    class="flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-xl font-semibold text-sky-100"
+                  >
+                    --
+                  </div>
+                  <div>
+                    <p id="member-name" class="text-2xl font-semibold text-white">
+                      Sin miembro seleccionado
+                    </p>
+                    <p id="member-status" class="mt-1 text-sm text-slate-400">
+                      Esperando asignación
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mt-5 space-y-3">
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  >
+                    <p
+                      class="text-xs uppercase tracking-[0.2em] text-slate-500"
+                    >
+                      Correo
+                    </p>
+                    <p class="mt-2 text-sm text-slate-500">Sin información</p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  >
+                    <p
+                      class="text-xs uppercase tracking-[0.2em] text-slate-500"
+                    >
+                      Teléfono
+                    </p>
+                    <p class="mt-2 text-sm text-slate-500">Sin información</p>
+                  </div>
+                  <div
+                    class="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  >
+                    <p
+                      class="text-xs uppercase tracking-[0.2em] text-slate-500"
+                    >
+                      Objetivo principal
+                    </p>
+                    <p class="mt-2 text-sm text-slate-500">Sin información</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition duration-300 hover:border-white/20 hover:bg-white/[0.05]"
+            >
+              <p class="text-xs uppercase tracking-[0.28em] text-slate-400">
+                Vista ampliada
+              </p>
+              <h3 class="mt-3 text-2xl font-semibold text-white">
+                Datos que necesita el entrenador
+              </h3>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Edad</p>
+                  <p class="mt-2 text-2xl font-semibold text-white">--</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Peso inicial</p>
+                  <p class="mt-2 text-2xl font-semibold text-white">--</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Estatura</p>
+                  <p class="mt-2 text-2xl font-semibold text-white">--</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-slate-400">Disponibilidad</p>
+                  <p class="mt-2 text-2xl font-semibold text-white">--</p>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                <div class="rounded-3xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm font-medium text-white">
+                    Historial deportivo
+                  </p>
+                  <p class="mt-3 text-sm leading-6 text-slate-500">
+                    Sin información disponible.
+                  </p>
+                </div>
+                <div class="rounded-3xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm font-medium text-white">
+                    Observaciones médicas
+                  </p>
+                  <p class="mt-3 text-sm leading-6 text-slate-500">
+                    Sin información disponible.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="mt-5 rounded-3xl border border-dashed border-sky-400/20 bg-sky-400/10 px-4 py-5 text-sm leading-6 text-sky-50"
+              >
+                Cuando exista una solicitud activa, aquí podrás ver la ficha
+                completa del miembro antes de tomar una decisión.
+              </div>
+
+              <div class="mt-5 rounded-[24px] border border-cyan-300/20 bg-black/20 p-4">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.24em] text-cyan-200">
+                      Rutina del miembro
+                    </p>
+                    <h4 class="mt-2 text-xl font-semibold text-white">
+                      Plan generado
+                    </h4>
+                  </div>
+                  <span id="trainer-routine-pill" class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">
+                    Sin rutina
+                  </span>
+                </div>
+                <div id="trainer-routine-list" class="mt-4 grid gap-3">
+                  <div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">
+                    El miembro aún no ha generado una rutina.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+    <script src="./js/responsiveMenu.js"></script>
+    <script src="./js/dashboardTrainer.js?v=2"></script>
+  </body>
+</html>
