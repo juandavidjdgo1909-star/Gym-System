@@ -12,6 +12,10 @@ const state = {
   trainerProfiles: [],
   routineExercises: [],
   currentRoutine: null,
+  attendance: [],
+  progressEntries: [],
+  notifications: [],
+  trainerMessages: [],
   activeSubscription: null,
   sessionsPage: 1,
   currentInvoice: null,
@@ -163,6 +167,10 @@ async function loadDashboard() {
     profiles,
     routineExercises,
     currentRoutine,
+    attendance,
+    progressEntries,
+    notifications,
+    trainerMessages,
   ] = await Promise.all([
     api("/memberships"),
     api(`/subscriptions/user/${state.user._id}`),
@@ -172,6 +180,10 @@ async function loadDashboard() {
     api("/trainer-profiles"),
     api("/routine-exercises"),
     api(`/member-routines/user/${state.user._id}`),
+    api(`/attendance/user/${state.user._id}`),
+    api(`/progress/user/${state.user._id}`),
+    api(`/notifications?user=${state.user._id}&role=Miembro`),
+    api(`/trainer-messages?member=${state.user._id}`),
   ]);
 
   Object.assign(state, {
@@ -184,6 +196,10 @@ async function loadDashboard() {
     trainerProfiles: profiles,
     routineExercises,
     currentRoutine,
+    attendance,
+    progressEntries,
+    notifications,
+    trainerMessages,
   });
   const freshUser = users.find((user) => user._id === state.user._id);
   if (freshUser) {
@@ -540,6 +556,216 @@ function renderAll() {
   renderTrainers();
   renderBookingForm();
   renderSessions();
+  renderMemberUpgradePanels();
+  renderProgressPanel();
+  renderAttendancePanel();
+  renderMemberMessages();
+  renderMemberNotifications();
+}
+
+function ensureMemberUpgradePanels() {
+  if ($("member-upgrade-panels")) return;
+  document.querySelector(".dashboard-content")?.insertAdjacentHTML(
+    "beforeend",
+    `
+      <section id="member-upgrade-panels" class="mt-6 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <div class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <div class="border-b border-white/10 pb-4">
+            <p class="text-xs uppercase tracking-[0.28em] text-lime-200/80">Check-in digital</p>
+            <h3 class="mt-3 text-2xl font-semibold text-white">Entrada por app/QR</h3>
+          </div>
+          <div class="mt-5 grid gap-3">
+            <button id="member-checkin" type="button" class="rounded-2xl bg-lime-300 px-4 py-3 text-sm font-black uppercase tracking-[0.16em] text-slate-950 transition hover:bg-white">Registrar entrada hoy</button>
+            <p id="member-checkin-status" class="text-sm leading-6 text-slate-300">Aun no hay registro de hoy.</p>
+            <div id="member-attendance-list" class="grid gap-2"></div>
+          </div>
+        </div>
+        <div class="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+          <div class="border-b border-white/10 pb-4">
+            <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">Progreso fisico</p>
+            <h3 class="mt-3 text-2xl font-semibold text-white">Medidas y energia</h3>
+          </div>
+          <form id="progress-form" class="mt-5 grid gap-3 md:grid-cols-4">
+            <input id="progress-weight" type="number" step="0.1" min="0" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" placeholder="Peso kg" />
+            <input id="progress-waist" type="number" step="0.1" min="0" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" placeholder="Cintura cm" />
+            <input id="progress-energy" type="number" min="1" max="10" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" placeholder="Energia 1-10" />
+            <button type="submit" class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100">Guardar</button>
+            <textarea id="progress-note" class="md:col-span-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" rows="2" placeholder="Nota de progreso"></textarea>
+          </form>
+          <div id="progress-chart" class="mt-5 grid gap-3"></div>
+        </div>
+      </section>
+      <section id="member-notifications-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="border-b border-white/10 pb-4">
+          <p class="text-xs uppercase tracking-[0.28em] text-amber-200/80">Centro de avisos</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">Notificaciones inteligentes</h3>
+        </div>
+        <div id="member-notifications-list" class="mt-5 grid gap-3"></div>
+      </section>
+      <section id="member-messages-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="border-b border-white/10 pb-4">
+          <p class="text-xs uppercase tracking-[0.28em] text-violet-200/80">Notas entrenador-miembro</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">Conversacion de seguimiento</h3>
+        </div>
+        <form id="member-message-form" class="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+          <select id="member-message-trainer" class="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white"></select>
+          <button type="submit" class="rounded-2xl border border-violet-400/20 bg-violet-400/10 px-4 py-3 text-sm font-semibold text-violet-100">Enviar</button>
+          <textarea id="member-message-text" rows="3" class="md:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white" placeholder="Escribe una pregunta o nota para tu entrenador"></textarea>
+        </form>
+        <div id="member-messages-list" class="mt-5 grid gap-3"></div>
+      </section>
+    `,
+  );
+  $("member-checkin")?.addEventListener("click", () =>
+    handleCheckIn().catch((error) => toast(error.message, "error")),
+  );
+  $("progress-form")?.addEventListener("submit", (event) =>
+    handleProgressSubmit(event).catch((error) => toast(error.message, "error")),
+  );
+  $("member-message-form")?.addEventListener("submit", (event) =>
+    handleMemberMessageSubmit(event).catch((error) => toast(error.message, "error")),
+  );
+}
+
+function renderMemberUpgradePanels() {
+  ensureMemberUpgradePanels();
+}
+
+function renderAttendancePanel() {
+  ensureMemberUpgradePanels();
+  const today = new Date().toISOString().slice(0, 10);
+  const checkedToday = state.attendance.some(
+    (item) => new Date(item.checkInAt).toISOString().slice(0, 10) === today,
+  );
+  $("member-checkin").disabled = checkedToday;
+  $("member-checkin").classList.toggle("opacity-50", checkedToday);
+  $("member-checkin-status").textContent = checkedToday
+    ? "Entrada registrada hoy. Tu racha sigue viva."
+    : "Registra tu entrada cuando llegues al gimnasio.";
+  $("member-attendance-list").innerHTML =
+    state.attendance.slice(0, 5).map((item) => `
+      <div class="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+        ${fmtDate(item.checkInAt)} · ${new Date(item.checkInAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+      </div>`).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-slate-400">Sin asistencias registradas.</div>`;
+}
+
+async function handleCheckIn() {
+  await api("/attendance", {
+    method: "POST",
+    body: JSON.stringify({ user: state.user._id, source: "App" }),
+  });
+  await api("/notifications", {
+    method: "POST",
+    body: JSON.stringify({
+      role: "Admin",
+      title: "Nuevo check-in",
+      message: `${state.user.name} registro entrada al gimnasio.`,
+      type: "success",
+    }),
+  }).catch(() => {});
+  toast("Entrada registrada correctamente.", "success");
+  await loadDashboard();
+}
+
+function renderProgressPanel() {
+  ensureMemberUpgradePanels();
+  const latest = state.progressEntries[0];
+  if (latest) {
+    $("progress-weight").placeholder = `Ultimo ${latest.weight || "-"} kg`;
+    $("progress-waist").placeholder = `Ultimo ${latest.waist || "-"} cm`;
+    $("progress-energy").placeholder = `Energia ${latest.energy || "-"}`;
+  }
+  const maxWeight = Math.max(...state.progressEntries.map((item) => Number(item.weight || 0)), 1);
+  $("progress-chart").innerHTML =
+    state.progressEntries.slice(0, 6).map((item) => `
+      <div class="grid grid-cols-[86px_1fr_70px] items-center gap-3 text-sm text-slate-300">
+        <span>${fmtDate(item.entryDate)}</span>
+        <div class="h-3 overflow-hidden rounded-full bg-white/10">
+          <div class="h-full rounded-full bg-gradient-to-r from-cyan-300 to-lime-300" style="width:${Math.max(8, (Number(item.weight || 0) / maxWeight) * 100)}%"></div>
+        </div>
+        <span class="text-right">${item.weight || "-"} kg</span>
+      </div>`).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Guarda tu primera medida para ver evolucion.</div>`;
+}
+
+async function handleProgressSubmit(event) {
+  event.preventDefault();
+  await api("/progress", {
+    method: "POST",
+    body: JSON.stringify({
+      user: state.user._id,
+      weight: Number($("progress-weight").value || 0),
+      waist: Number($("progress-waist").value || 0),
+      energy: Number($("progress-energy").value || 0),
+      note: $("progress-note").value.trim(),
+    }),
+  });
+  $("progress-form").reset();
+  toast("Progreso guardado.", "success");
+  await loadDashboard();
+}
+
+function renderMemberNotifications() {
+  ensureMemberUpgradePanels();
+  const localAlerts = [];
+  if (state.activeSubscription) {
+    const days = daysLeft(state.activeSubscription);
+    if (days <= 7) localAlerts.push(["Membresia por vencer", `Te quedan ${days} dias. Puedes renovar desde planes.`, "warning"]);
+  }
+  const nextSession = state.sessions
+    .filter((session) => new Date(session.date) >= new Date() && session.status !== "Cancelada")
+    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+  if (nextSession) localAlerts.push(["Proxima cita", `${fmtDate(nextSession.date)} a las ${nextSession.hour || "--:--"}.`, "info"]);
+  const alerts = [
+    ...localAlerts,
+    ...state.notifications.slice(0, 5).map((item) => [item.title, item.message, item.type]),
+  ];
+  $("member-notifications-list").innerHTML =
+    alerts.map(([title, message, type]) => `
+      <article class="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p class="text-sm font-semibold ${type === "warning" ? "text-amber-100" : "text-cyan-100"}">${title}</p>
+        <p class="mt-1 text-sm leading-6 text-slate-400">${message}</p>
+      </article>`).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Sin avisos por ahora.</div>`;
+}
+
+function renderMemberMessages() {
+  ensureMemberUpgradePanels();
+  const trainerOptions = trainers();
+  $("member-message-trainer").innerHTML =
+    `<option value="" class="bg-slate-900">Selecciona entrenador</option>` +
+    trainerOptions.map((trainer) => `<option value="${trainer._id}" class="bg-slate-900">${trainer.name}</option>`).join("");
+  $("member-messages-list").innerHTML =
+    state.trainerMessages.slice(0, 8).map((item) => `
+      <article class="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p class="text-xs uppercase tracking-[0.2em] text-violet-200">${item.author?.name || "Usuario"} · ${fmtDate(item.createdAt)}</p>
+        <p class="mt-2 text-sm leading-6 text-slate-200">${item.message}</p>
+      </article>`).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Aun no hay notas con entrenadores.</div>`;
+}
+
+async function handleMemberMessageSubmit(event) {
+  event.preventDefault();
+  const trainer = $("member-message-trainer").value;
+  const message = $("member-message-text").value.trim();
+  if (!trainer || !message) {
+    toast("Selecciona entrenador y escribe un mensaje.", "error");
+    return;
+  }
+  await api("/trainer-messages", {
+    method: "POST",
+    body: JSON.stringify({
+      trainer,
+      member: state.user._id,
+      author: state.user._id,
+      category: "Pregunta",
+      message,
+    }),
+  });
+  $("member-message-form").reset();
+  toast("Mensaje enviado.", "success");
+  await loadDashboard();
 }
 
 // Muestra el generador y la rutina activa del miembro.
@@ -584,6 +810,17 @@ function renderRoutine() {
                     </div>
                   </div>
                   <p class="mt-4 text-sm leading-6 text-slate-300">${exercise.technique || "Ejecuta el movimiento con control y postura estable."}</p>
+                  <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <span class="text-sm font-semibold ${exercise.completed ? "text-emerald-100" : "text-slate-300"}">${exercise.completed ? "Completado" : "Pendiente"}</span>
+                      <button data-routine-complete="${index}" type="button" class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100">
+                        ${exercise.completed ? "Actualizar" : "Marcar hecho"}
+                      </button>
+                    </div>
+                    <p class="mt-2 text-xs leading-5 text-slate-400">
+                      ${exercise.weightUsed ? `${exercise.weightUsed} kg` : "Sin peso registrado"} · RPE ${exercise.rpe || "-"} ${exercise.notes ? `· ${exercise.notes}` : ""}
+                    </p>
+                  </div>
                 </div>
                 <div class="overflow-hidden rounded-[22px] border border-white/10 bg-black/30">
                   ${
@@ -596,6 +833,31 @@ function renderRoutine() {
           })
           .join("")
       : `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400">Crea tu rutina para ver el paso a paso y los videos.</div>`;
+}
+
+async function updateRoutineExercise(index) {
+  if (!state.currentRoutine?._id) return;
+  const exercise = state.currentRoutine.exercises[index];
+  const weightUsed = prompt("Peso usado en kg:", exercise?.weightUsed || "");
+  if (weightUsed === null) return;
+  const rpe = prompt("Dificultad percibida RPE 1-10:", exercise?.rpe || "7");
+  if (rpe === null) return;
+  const notes = prompt("Nota corta del ejercicio:", exercise?.notes || "");
+  if (notes === null) return;
+  state.currentRoutine = await api(
+    `/member-routines/${state.currentRoutine._id}/exercises/${index}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        completed: true,
+        weightUsed,
+        rpe,
+        notes,
+      }),
+    },
+  );
+  renderRoutine();
+  toast("Ejercicio actualizado.", "success");
 }
 
 // Genera una rutina personalizada desde las respuestas del formulario.
@@ -818,29 +1080,56 @@ async function buyPlan(planId) {
   const endDate = new Date();
   endDate.setDate(startDate.getDate() + Number(plan.durationInDays || 1));
 
-  await api("/subscriptions", {
-    method: "POST",
-    body: JSON.stringify({
-      user: state.user._id,
-      membership: plan._id,
-      startDate,
-      endDate,
-      status: "Activa",
-    }),
-  });
-  await api("/payments", {
+  const methodChoice = prompt(
+    "Metodo de pago simulado: 1 Tarjeta aprobada, 2 Mercado Pago aprobado, 3 Transferencia pendiente",
+    "1",
+  );
+  if (methodChoice === null) return;
+  const methodMap = { 1: "Tarjeta", 2: "Mercado Pago", 3: "Transferencia" };
+  const method = methodMap[methodChoice.trim()] || "Tarjeta";
+  const status = method === "Transferencia" ? "Pendiente" : "Pagado";
+  const payment = await api("/payments", {
     method: "POST",
     body: JSON.stringify({
       user: state.user._id,
       membership: plan._id,
       amount: plan.price,
-      method: "Transferencia",
-      status: "Pagado",
+      method,
+      status,
       paymentDate: new Date(),
+      providerReference: `SIM-${Date.now()}`,
+      checkoutUrl: `https://checkout.gym-system.local/${plan._id}`,
     }),
   });
 
-  toast(`Compraste ${plan.name}.`, "success");
+  if (status === "Pagado") {
+    await api("/subscriptions", {
+      method: "POST",
+      body: JSON.stringify({
+        user: state.user._id,
+        membership: plan._id,
+        startDate,
+        endDate,
+        status: "Activa",
+      }),
+    });
+  }
+  await api("/notifications", {
+    method: "POST",
+    body: JSON.stringify({
+      role: "Admin",
+      title: status === "Pagado" ? "Pago aprobado" : "Pago pendiente",
+      message: `${state.user.name} inicio checkout ${payment.providerReference || ""} por ${plan.name}.`,
+      type: status === "Pagado" ? "success" : "warning",
+    }),
+  }).catch(() => {});
+
+  toast(
+    status === "Pagado"
+      ? `Compraste ${plan.name}.`
+      : `Checkout generado para ${plan.name}. Queda pendiente de confirmacion.`,
+    status === "Pagado" ? "success" : "info",
+  );
   await loadDashboard();
 }
 
@@ -1086,6 +1375,15 @@ function bindEvents() {
       toast(error.message, "error"),
     ),
   );
+  $("member-checkin")?.addEventListener("click", () =>
+    handleCheckIn().catch((error) => toast(error.message, "error")),
+  );
+  $("progress-form")?.addEventListener("submit", (event) =>
+    handleProgressSubmit(event).catch((error) => toast(error.message, "error")),
+  );
+  $("member-message-form")?.addEventListener("submit", (event) =>
+    handleMemberMessageSubmit(event).catch((error) => toast(error.message, "error")),
+  );
   $("booking-form").addEventListener("submit", (event) =>
     handleBooking(event).catch((error) => toast(error.message, "error")),
   );
@@ -1093,6 +1391,7 @@ function bindEvents() {
     const buyButton = event.target.closest("[data-buy-plan]");
     const cancelButton = event.target.closest("[data-cancel-session]");
     const invoiceButton = event.target.closest("[data-invoice]");
+    const routineButton = event.target.closest("[data-routine-complete]");
     if (buyButton) {
       buyPlan(buyButton.dataset.buyPlan).catch((error) =>
         toast(error.message, "error"),
@@ -1100,6 +1399,11 @@ function bindEvents() {
     }
     if (invoiceButton) {
       showInvoice(invoiceButton.dataset.invoice);
+    }
+    if (routineButton) {
+      updateRoutineExercise(Number(routineButton.dataset.routineComplete)).catch((error) =>
+        toast(error.message, "error"),
+      );
     }
     if (cancelButton) {
       cancelSession(cancelButton.dataset.cancelSession).catch((error) =>

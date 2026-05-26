@@ -18,7 +18,7 @@ const paymentSchema = new Schema(
     },
     method: {
       type: String,
-      enum: ["Tarjeta", "Transferencia", "Efectivo"],
+      enum: ["Tarjeta", "Transferencia", "Efectivo", "Wompi", "Mercado Pago"],
       required: true,
     },
     status: {
@@ -29,6 +29,14 @@ const paymentSchema = new Schema(
     paymentDate: {
       type: Date,
       required: true,
+    },
+    providerReference: {
+      type: String,
+      trim: true,
+    },
+    checkoutUrl: {
+      type: String,
+      trim: true,
     },
   },
   { timestamps: true },

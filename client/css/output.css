@@ -1164,6 +1164,14 @@ video {
   grid-template-columns: 1fr auto;
 }
 
+.grid-cols-\[72px_1fr_110px\] {
+  grid-template-columns: 72px 1fr 110px;
+}
+
+.grid-cols-\[86px_1fr_70px\] {
+  grid-template-columns: 86px 1fr 70px;
+}
+
 .flex-col {
   flex-direction: column;
 }
@@ -2052,6 +2060,10 @@ video {
   text-transform: uppercase;
 }
 
+.capitalize {
+  text-transform: capitalize;
+}
+
 .italic {
   font-style: italic;
 }
@@ -2155,6 +2167,10 @@ video {
   color: rgb(207 250 254 / var(--tw-text-opacity, 1));
 }
 
+.text-cyan-100\/80 {
+  color: rgb(207 250 254 / 0.8);
+}
+
 .text-cyan-200 {
   --tw-text-opacity: 1;
   color: rgb(165 243 252 / var(--tw-text-opacity, 1));
@@ -2199,6 +2215,10 @@ video {
 .text-lime-200 {
   --tw-text-opacity: 1;
   color: rgb(217 249 157 / var(--tw-text-opacity, 1));
+}
+
+.text-lime-200\/80 {
+  color: rgb(217 249 157 / 0.8);
 }
 
 .text-lime-700 {
@@ -2491,20 +2511,16 @@ video {
 
 .backdrop-blur-md {
   --tw-backdrop-blur: blur(12px);
-  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .backdrop-blur-xl {
   --tw-backdrop-blur: blur(24px);
-  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .transition {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -2766,8 +2782,7 @@ body {
       rgba(2, 6, 23, 0.72) 70%,
       transparent
     );
-    -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
 
   /* Boton principal para abrir/cerrar el menu en pantallas pequenas. */
@@ -3917,6 +3932,14 @@ body {
 }
 
 @media (min-width: 768px) {
+  .md\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
+  .md\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+
   .md\:flex {
     display: flex;
   }
@@ -3939,6 +3962,14 @@ body {
 
   .md\:grid-cols-\[1fr_0\.7fr\] {
     grid-template-columns: 1fr 0.7fr;
+  }
+
+  .md\:grid-cols-\[1fr_0\.8fr_0\.7fr\] {
+    grid-template-columns: 1fr 0.8fr 0.7fr;
+  }
+
+  .md\:grid-cols-\[1fr_auto\] {
+    grid-template-columns: 1fr auto;
   }
 }
 
@@ -3981,6 +4012,14 @@ body {
 
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .lg\:grid-cols-\[0\.75fr_1\.25fr\] {
@@ -4085,6 +4124,10 @@ body {
 }
 
 @media (min-width: 1280px) {
+  .xl\:col-start-2 {
+    grid-column-start: 2;
+  }
+
   .xl\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -4103,6 +4146,10 @@ body {
 
   .xl\:grid-cols-\[1\.05fr_0\.95fr\] {
     grid-template-columns: 1.05fr 0.95fr;
+  }
+
+  .xl\:grid-cols-\[1\.25fr_0\.75fr\] {
+    grid-template-columns: 1.25fr 0.75fr;
   }
 
   .xl\:flex-row {

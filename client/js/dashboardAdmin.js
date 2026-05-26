@@ -9,6 +9,11 @@ const state = {
   sessions: [],
   trainerProfiles: [],
   routineExercises: [],
+  attendance: [],
+  progressEntries: [],
+  notifications: [],
+  routineExercisesPage: 1,
+  routineExercisesPerPage: 5,
   siteContent: null,
   currentUser: null,
   usersSearch: "",
@@ -157,6 +162,9 @@ async function loadDashboard() {
     profiles,
     siteContent,
     routineExercises,
+    attendance,
+    progressEntries,
+    notifications,
   ] =
     await Promise.all([
       api("/users"),
@@ -167,6 +175,9 @@ async function loadDashboard() {
       api("/trainer-profiles"),
       api("/site-content"),
       api("/routine-exercises"),
+      api("/attendance"),
+      api("/progress"),
+      api("/notifications?role=Admin"),
     ]);
 
   Object.assign(state, {
@@ -178,6 +189,9 @@ async function loadDashboard() {
     trainerProfiles: profiles,
     siteContent,
     routineExercises,
+    attendance,
+    progressEntries,
+    notifications,
   });
 
   renderAll();
@@ -192,14 +206,191 @@ function renderAll() {
   renderSiteContentForm();
   renderPayments();
   renderActivity();
+  renderExecutiveDashboard();
+  renderSmartAlerts();
+  renderAttendanceControl();
+}
+
+function ensureAdminUpgradePanels() {
+  if ($("executive-dashboard")) return;
+  $("resumen").insertAdjacentHTML(
+    "afterend",
+    `
+      <section id="executive-dashboard" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">Analitica ejecutiva</p>
+            <h3 class="mt-3 text-2xl font-semibold text-white">Pulso comercial del gimnasio</h3>
+          </div>
+          <span id="executive-month-pill" class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">Mes actual</span>
+        </div>
+        <div class="mt-5 grid gap-4 lg:grid-cols-4">
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+            <p class="text-sm text-cyan-100/80">Ingreso del mes</p>
+            <p id="executive-month-revenue" class="mt-2 text-3xl font-semibold text-white">$ 0</p>
+          </div>
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+            <p class="text-sm text-emerald-100/80">Retencion estimada</p>
+            <p id="executive-retention" class="mt-2 text-3xl font-semibold text-white">0%</p>
+          </div>
+          <div class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4">
+            <p class="text-sm text-amber-100/80">Check-ins hoy</p>
+            <p id="executive-checkins" class="mt-2 text-3xl font-semibold text-white">0</p>
+          </div>
+          <div class="rounded-2xl border border-violet-400/20 bg-violet-400/10 p-4">
+            <p class="text-sm text-violet-100/80">Plan mas vendido</p>
+            <p id="executive-top-plan" class="mt-2 text-2xl font-semibold text-white">Sin datos</p>
+          </div>
+        </div>
+        <div class="mt-5 grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+          <div class="rounded-3xl border border-white/10 bg-black/20 p-4">
+            <p class="text-sm font-semibold text-white">Ingresos por mes</p>
+            <div id="executive-revenue-bars" class="mt-4 grid gap-3"></div>
+          </div>
+          <div class="rounded-3xl border border-white/10 bg-black/20 p-4">
+            <p class="text-sm font-semibold text-white">Alertas inteligentes</p>
+            <div id="admin-smart-alerts" class="mt-4 grid gap-3"></div>
+          </div>
+        </div>
+      </section>
+      <section id="attendance-control" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.28em] text-lime-200/80">Asistencia QR</p>
+            <h3 class="mt-3 text-2xl font-semibold text-white">Check-ins recientes</h3>
+          </div>
+          <span id="attendance-total-pill" class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300">0 registros</span>
+        </div>
+        <div id="attendance-registry" class="mt-5 grid gap-3"></div>
+      </section>
+    `,
+  );
+}
+
+function sameMonth(date, now = new Date()) {
+  const value = new Date(date);
+  return value.getMonth() === now.getMonth() && value.getFullYear() === now.getFullYear();
+}
+
+function renderExecutiveDashboard() {
+  ensureAdminUpgradePanels();
+  const now = new Date();
+  const paid = state.payments.filter((payment) => payment.status === "Pagado");
+  const monthRevenue = paid
+    .filter((payment) => sameMonth(payment.paymentDate, now))
+    .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  const cancelled = state.subscriptions.filter((sub) => sub.status === "Cancelada").length;
+  const retention = state.subscriptions.length
+    ? Math.round(((state.subscriptions.length - cancelled) / state.subscriptions.length) * 100)
+    : 100;
+  const today = now.toISOString().slice(0, 10);
+  const checkInsToday = state.attendance.filter(
+    (item) => new Date(item.checkInAt).toISOString().slice(0, 10) === today,
+  ).length;
+  const planSales = state.subscriptions.reduce((acc, sub) => {
+    const name = sub.membership?.name || "Sin plan";
+    acc[name] = (acc[name] || 0) + 1;
+    return acc;
+  }, {});
+  const topPlan = Object.entries(planSales).sort((a, b) => b[1] - a[1])[0]?.[0] || "Sin datos";
+
+  $("executive-month-revenue").textContent = money(monthRevenue);
+  $("executive-retention").textContent = `${retention}%`;
+  $("executive-checkins").textContent = checkInsToday;
+  $("executive-top-plan").textContent = topPlan;
+  $("executive-month-pill").textContent = now.toLocaleDateString("es-CO", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const months = [...Array(6)].map((_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+    const total = paid
+      .filter((payment) => sameMonth(payment.paymentDate, date))
+      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+    return { label: date.toLocaleDateString("es-CO", { month: "short" }), total };
+  });
+  const max = Math.max(...months.map((item) => item.total), 1);
+  $("executive-revenue-bars").innerHTML = months
+    .map(
+      (item) => `
+        <div class="grid grid-cols-[72px_1fr_110px] items-center gap-3 text-sm">
+          <span class="capitalize text-slate-300">${item.label}</span>
+          <div class="h-3 overflow-hidden rounded-full bg-white/10">
+            <div class="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300" style="width:${Math.max(5, (item.total / max) * 100)}%"></div>
+          </div>
+          <span class="text-right text-slate-200">${money(item.total)}</span>
+        </div>`,
+    )
+    .join("");
+}
+
+function renderSmartAlerts() {
+  ensureAdminUpgradePanels();
+  const now = new Date();
+  const sevenDays = 7 * 86400000;
+  const expiring = state.subscriptions.filter((sub) => {
+    const diff = new Date(sub.endDate) - now;
+    return sub.status === "Activa" && diff >= 0 && diff <= sevenDays;
+  });
+  const pendingPayments = state.payments.filter((payment) => payment.status === "Pendiente");
+  const inactiveMembers = state.users.filter((user) => {
+    if (user.rol !== "Miembro") return false;
+    const last = state.attendance.find((item) => getId(item.user) === user._id);
+    return !last || now - new Date(last.checkInAt) > 10 * 86400000;
+  });
+  const alerts = [
+    [`${expiring.length} membresias por vencer`, "Contacta a estos miembros antes de que termine su plan.", "warning"],
+    [`${pendingPayments.length} pagos pendientes`, "Revisa o confirma los checkouts simulados.", "info"],
+    [`${inactiveMembers.length} miembros sin asistencia reciente`, "Buen momento para una accion de retencion.", "error"],
+    ...state.notifications.slice(0, 3).map((item) => [item.title, item.message, item.type]),
+  ];
+  $("admin-smart-alerts").innerHTML = alerts
+    .map(
+      ([title, message, type]) => `
+        <article class="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          <p class="text-sm font-semibold ${type === "error" ? "text-rose-100" : type === "warning" ? "text-amber-100" : "text-cyan-100"}">${title}</p>
+          <p class="mt-1 text-xs leading-5 text-slate-400">${message}</p>
+        </article>`,
+    )
+    .join("");
+}
+
+function renderAttendanceControl() {
+  ensureAdminUpgradePanels();
+  $("attendance-total-pill").textContent = `${state.attendance.length} registros`;
+  $("attendance-registry").innerHTML =
+    state.attendance.slice(0, 8).map((item) => {
+      const user = item.user || {};
+      return `
+        <div class="grid gap-2 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-slate-200 md:grid-cols-[1fr_0.8fr_0.7fr]">
+          <span>${user.name || "Miembro"}</span>
+          <span>${fmtDate(item.checkInAt)} ${new Date(item.checkInAt).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}</span>
+          <span>${item.source || "App"}</span>
+        </div>`;
+    }).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Aun no hay check-ins registrados.</div>`;
 }
 
 // Renderiza la biblioteca editable de ejercicios para rutinas.
 function renderRoutineExercises() {
+  const totalPages = Math.max(
+    1,
+    Math.ceil(state.routineExercises.length / state.routineExercisesPerPage),
+  );
+  state.routineExercisesPage = Math.min(
+    Math.max(1, state.routineExercisesPage),
+    totalPages,
+  );
+  const pageExercises = state.routineExercises.slice(
+    (state.routineExercisesPage - 1) * state.routineExercisesPerPage,
+    state.routineExercisesPage * state.routineExercisesPerPage,
+  );
+
   $("routine-exercises-pill").textContent =
     `${state.routineExercises.length} ejercicios`;
   $("routine-exercises-registry").innerHTML =
-    state.routineExercises
+    pageExercises
       .map(
         (exercise) => `
         <article class="rounded-2xl border border-white/10 bg-black/20 p-4 transition hover:border-cyan-300/30 hover:bg-white/[0.05]">
@@ -225,6 +416,26 @@ function renderRoutineExercises() {
       )
       .join("") ||
     `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400">Aun no hay ejercicios configurados.</div>`;
+  $("routine-exercises-pagination").classList.toggle(
+    "hidden",
+    state.routineExercises.length <= state.routineExercisesPerPage,
+  );
+  $("routine-exercises-pagination").classList.toggle(
+    "flex",
+    state.routineExercises.length > state.routineExercisesPerPage,
+  );
+  $("routine-exercises-page-info").textContent =
+    `Pagina ${state.routineExercisesPage} de ${totalPages}`;
+  $("routine-exercises-prev").disabled = state.routineExercisesPage === 1;
+  $("routine-exercises-next").disabled = state.routineExercisesPage === totalPages;
+  $("routine-exercises-prev").classList.toggle(
+    "opacity-50",
+    state.routineExercisesPage === 1,
+  );
+  $("routine-exercises-next").classList.toggle(
+    "opacity-50",
+    state.routineExercisesPage === totalPages,
+  );
 }
 
 // Limpia el formulario de ejercicios de rutina.
@@ -262,6 +473,7 @@ async function handleRoutineExerciseSubmit(event) {
       method: "POST",
       body: JSON.stringify(payload),
     });
+    state.routineExercisesPage = 1;
   }
   resetRoutineExerciseForm();
   toast(id ? "Ejercicio actualizado." : "Ejercicio creado.", "success");
@@ -290,6 +502,7 @@ function editRoutineExercise(id) {
 async function deleteRoutineExercise(id) {
   if (!confirm("Eliminar este ejercicio de rutina?")) return;
   await api(`/routine-exercises/${id}`, { method: "DELETE" });
+  state.routineExercisesPage = Math.max(1, state.routineExercisesPage);
   toast("Ejercicio eliminado.", "success");
   await loadDashboard();
 }
@@ -996,6 +1209,14 @@ function bindEvents() {
   );
   $("membership-reset").addEventListener("click", resetMembershipForm);
   $("routine-exercise-reset").addEventListener("click", resetRoutineExerciseForm);
+  $("routine-exercises-prev").addEventListener("click", () => {
+    state.routineExercisesPage = Math.max(1, state.routineExercisesPage - 1);
+    renderRoutineExercises();
+  });
+  $("routine-exercises-next").addEventListener("click", () => {
+    state.routineExercisesPage += 1;
+    renderRoutineExercises();
+  });
   $("admin-users-search").addEventListener("input", (event) => {
     state.usersSearch = event.target.value;
     state.usersPage = 1;

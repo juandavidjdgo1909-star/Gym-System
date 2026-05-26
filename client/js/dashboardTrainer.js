@@ -7,6 +7,7 @@ const state = {
   users: [],
   subscriptions: [],
   memberRoutines: [],
+  trainerMessages: [],
   selectedSessionId: null,
   paymentTimer: null,
 };
@@ -143,14 +144,15 @@ function logout() {
 
 // Carga sesiones, usuarios, pagos y membresias.
 async function loadDashboard(selectionMode = "auto") {
-  const [sessions, users, subscriptions, memberRoutines] = await Promise.all([
+  const [sessions, users, subscriptions, memberRoutines, trainerMessages] = await Promise.all([
     api(`/training-sessions/trainer/${state.trainer._id}`),
     api("/users"),
     api("/subscriptions"),
     api("/member-routines"),
+    api(`/trainer-messages?trainer=${state.trainer._id}`),
   ]);
 
-  Object.assign(state, { sessions, users, subscriptions, memberRoutines });
+  Object.assign(state, { sessions, users, subscriptions, memberRoutines, trainerMessages });
   const selectedSession = state.sessions.find(
     (session) => session._id === state.selectedSessionId,
   );
@@ -429,6 +431,128 @@ function renderAll() {
   renderRequests();
   renderSelectedMember();
   renderPaymentCountdown();
+  renderTrainerAgenda();
+  renderTrainerMessages();
+}
+
+function ensureTrainerUpgradePanels() {
+  if ($("trainer-agenda-panel")) return;
+  document.querySelector(".dashboard-content")?.insertAdjacentHTML(
+    "beforeend",
+    `
+      <section id="trainer-agenda-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="border-b border-white/10 pb-4">
+          <p class="text-xs uppercase tracking-[0.28em] text-cyan-200/80">Agenda semanal</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">Calendario visual de sesiones</h3>
+        </div>
+        <div id="trainer-agenda-grid" class="mt-5 grid gap-3 lg:grid-cols-7"></div>
+      </section>
+      <section id="trainer-message-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="border-b border-white/10 pb-4">
+          <p class="text-xs uppercase tracking-[0.28em] text-violet-200/80">Notas de seguimiento</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">Entrenador y miembro</h3>
+        </div>
+        <form id="trainer-message-form" class="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+          <textarea id="trainer-message-text" rows="3" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white md:col-span-2" placeholder="Escribe una nota para el miembro seleccionado"></textarea>
+          <select id="trainer-message-category" class="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white">
+            <option value="Nota" class="bg-slate-900">Nota</option>
+            <option value="Ajuste" class="bg-slate-900">Ajuste</option>
+            <option value="Pregunta" class="bg-slate-900">Pregunta</option>
+          </select>
+          <button type="submit" class="rounded-2xl border border-violet-400/20 bg-violet-400/10 px-4 py-3 text-sm font-semibold text-violet-100">Guardar nota</button>
+        </form>
+        <div id="trainer-messages-list" class="mt-5 grid gap-3"></div>
+      </section>
+    `,
+  );
+  $("trainer-message-form")?.addEventListener("submit", (event) =>
+    handleTrainerMessageSubmit(event).catch((error) => toast(error.message, "error")),
+  );
+}
+
+function startOfWeek(date = new Date()) {
+  const result = new Date(date);
+  const day = result.getDay() || 7;
+  result.setDate(result.getDate() - day + 1);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+function renderTrainerAgenda() {
+  ensureTrainerUpgradePanels();
+  const start = startOfWeek();
+  const days = [...Array(7)].map((_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    const sessions = state.sessions
+      .filter((session) => new Date(session.date).toISOString().slice(0, 10) === key)
+      .sort((a, b) => String(a.hour || "").localeCompare(String(b.hour || "")));
+    return { date, sessions };
+  });
+  $("trainer-agenda-grid").innerHTML = days
+    .map(
+      (day) => `
+        <article class="rounded-2xl border border-white/10 bg-black/20 p-3">
+          <p class="text-xs uppercase tracking-[0.2em] text-cyan-200">${day.date.toLocaleDateString("es-CO", { weekday: "short" })}</p>
+          <p class="mt-1 text-lg font-semibold text-white">${day.date.getDate()}</p>
+          <div class="mt-3 grid gap-2">
+            ${
+              day.sessions
+                .map((session) => {
+                  const member = memberFor(session);
+                  return `<button data-view-session="${session._id}" type="button" class="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-left text-xs text-slate-200">
+                    <span class="block font-semibold text-white">${session.hour || "--:--"}</span>
+                    <span>${member.name || "Miembro"} · ${session.status}</span>
+                  </button>`;
+                })
+                .join("") || `<p class="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center text-xs text-slate-500">Libre</p>`
+            }
+          </div>
+        </article>`,
+    )
+    .join("");
+}
+
+function renderTrainerMessages() {
+  ensureTrainerUpgradePanels();
+  const session = state.sessions.find((item) => item._id === state.selectedSessionId);
+  const member = memberFor(session);
+  const memberId = member?._id;
+  const messages = memberId
+    ? state.trainerMessages.filter((item) => getId(item.member) === memberId)
+    : state.trainerMessages;
+  $("trainer-messages-list").innerHTML =
+    messages.slice(0, 8).map((item) => `
+      <article class="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p class="text-xs uppercase tracking-[0.2em] text-violet-200">${item.category || "Nota"} · ${item.author?.name || "Usuario"} · ${fmtDate(item.createdAt)}</p>
+        <p class="mt-2 text-sm leading-6 text-slate-200">${item.message}</p>
+      </article>`).join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Selecciona un miembro y guarda la primera nota.</div>`;
+}
+
+async function handleTrainerMessageSubmit(event) {
+  event.preventDefault();
+  const session = state.sessions.find((item) => item._id === state.selectedSessionId);
+  const member = memberFor(session);
+  const message = $("trainer-message-text").value.trim();
+  if (!member?._id || !message) {
+    toast("Selecciona una solicitud/sesion y escribe una nota.", "error");
+    return;
+  }
+  await api("/trainer-messages", {
+    method: "POST",
+    body: JSON.stringify({
+      trainer: state.trainer._id,
+      member: member._id,
+      author: state.trainer._id,
+      category: $("trainer-message-category").value,
+      message,
+    }),
+  });
+  $("trainer-message-form").reset();
+  toast("Nota guardada para el miembro.", "success");
+  await loadDashboard();
 }
 
 // Marca el enlace activo del menu.
@@ -483,6 +607,7 @@ function bindEvents() {
     if (viewButton) {
       state.selectedSessionId = viewButton.dataset.viewSession;
       renderSelectedMember();
+      renderTrainerMessages();
       $("miembro-detalle").scrollIntoView({
         behavior: "smooth",
         block: "start",

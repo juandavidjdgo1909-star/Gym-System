@@ -17,6 +17,10 @@ import trainerProfileRoutes from "./src/routes/trainerProfileRoutes.js";
 import siteContentRoutes from "./src/routes/siteContentRoutes.js";
 import routineExerciseRoutes from "./src/routes/routineExerciseRoutes.js";
 import memberRoutineRoutes from "./src/routes/memberRoutineRoutes.js";
+import attendanceRoutes from "./src/routes/attendanceRoutes.js";
+import notificationRoutes from "./src/routes/notificationRoutes.js";
+import progressEntryRoutes from "./src/routes/progressEntryRoutes.js";
+import trainerMessageRoutes from "./src/routes/trainerMessageRoutes.js";
 
 dotenv.config();
 
@@ -63,6 +67,10 @@ app.use("/api/trainer-profiles", trainerProfileRoutes);
 app.use("/api/site-content", siteContentRoutes);
 app.use("/api/routine-exercises", routineExerciseRoutes);
 app.use("/api/member-routines", memberRoutineRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/progress", progressEntryRoutes);
+app.use("/api/trainer-messages", trainerMessageRoutes);
 
 app.use(errorHandler);
 

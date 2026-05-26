@@ -25,6 +25,11 @@ const memberRoutineSchema = new Schema(
         videoUrl: { type: String, trim: true },
         technique: { type: String, trim: true },
         order: Number,
+        completed: { type: Boolean, default: false },
+        completedAt: Date,
+        weightUsed: { type: Number, min: 0 },
+        rpe: { type: Number, min: 1, max: 10 },
+        notes: { type: String, trim: true },
       },
     ],
     status: {
