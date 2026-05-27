@@ -9,6 +9,8 @@ const state = {
   memberRoutines: [],
   trainerMessages: [],
   selectedSessionId: null,
+  trainerRoutinePage: 1,
+  trainerRoutinePerPage: 2,
   paymentTimer: null,
 };
 
@@ -423,6 +425,70 @@ function renderSelectedMember() {
           )
           .join("")
       : `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">El miembro aun no ha generado una rutina.</div>`;
+  const routineExercises = routine?.exercises?.length
+    ? [...routine.exercises].sort(
+        (a, b) => Number(a.order || 0) - Number(b.order || 0),
+      )
+    : [];
+  const totalRoutinePages = Math.max(
+    1,
+    Math.ceil(routineExercises.length / state.trainerRoutinePerPage),
+  );
+  state.trainerRoutinePage = Math.min(
+    Math.max(1, state.trainerRoutinePage),
+    totalRoutinePages,
+  );
+  const pageExercises = routineExercises.slice(
+    (state.trainerRoutinePage - 1) * state.trainerRoutinePerPage,
+    state.trainerRoutinePage * state.trainerRoutinePerPage,
+  );
+  $("trainer-routine-list").innerHTML =
+    routineExercises.length
+      ? pageExercises
+          .map((exercise, pageIndex) => {
+            const index =
+              (state.trainerRoutinePage - 1) * state.trainerRoutinePerPage +
+              pageIndex;
+            return `
+            <div class="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm text-slate-300 md:grid-cols-[1fr_0.7fr]">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-cyan-200">Paso ${index + 1} - ${exercise.focus || "Rutina"}</p>
+                <p class="mt-2 font-semibold text-white">${exercise.name}</p>
+                <p class="mt-1">${exercise.sets || 3} series - ${exercise.reps || "10-12"} reps - descanso ${exercise.rest || "60s"}</p>
+                <p class="mt-2 leading-6 text-slate-400">${exercise.technique || "Sin indicaciones registradas."}</p>
+              </div>
+              <div class="flex items-center justify-end">
+                ${
+                  exercise.videoUrl
+                    ? `<a href="${exercise.videoUrl}" target="_blank" class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100">Ver tecnica</a>`
+                    : `<span class="text-xs text-slate-500">Sin video</span>`
+                }
+              </div>
+            </div>`;
+          })
+          .join("")
+      : `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">El miembro aun no ha generado una rutina.</div>`;
+  $("trainer-routine-pagination").classList.toggle(
+    "hidden",
+    routineExercises.length <= state.trainerRoutinePerPage,
+  );
+  $("trainer-routine-pagination").classList.toggle(
+    "flex",
+    routineExercises.length > state.trainerRoutinePerPage,
+  );
+  $("trainer-routine-page-info").textContent =
+    `Pagina ${state.trainerRoutinePage} de ${totalRoutinePages}`;
+  $("trainer-routine-prev").disabled = state.trainerRoutinePage === 1;
+  $("trainer-routine-next").disabled =
+    state.trainerRoutinePage === totalRoutinePages;
+  $("trainer-routine-prev").classList.toggle(
+    "opacity-50",
+    state.trainerRoutinePage === 1,
+  );
+  $("trainer-routine-next").classList.toggle(
+    "opacity-50",
+    state.trainerRoutinePage === totalRoutinePages,
+  );
 }
 
 // Renderiza todas las secciones del panel.
@@ -606,12 +672,21 @@ function bindEvents() {
     }
     if (viewButton) {
       state.selectedSessionId = viewButton.dataset.viewSession;
+      state.trainerRoutinePage = 1;
       renderSelectedMember();
       renderTrainerMessages();
       $("miembro-detalle").scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
+    }
+    if (event.target.closest("[data-trainer-routine-prev]")) {
+      state.trainerRoutinePage = Math.max(1, state.trainerRoutinePage - 1);
+      renderSelectedMember();
+    }
+    if (event.target.closest("[data-trainer-routine-next]")) {
+      state.trainerRoutinePage += 1;
+      renderSelectedMember();
     }
     if (acceptButton) {
       updateSessionStatus(
