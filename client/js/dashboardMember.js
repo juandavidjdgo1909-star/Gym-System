@@ -18,6 +18,8 @@ const state = {
   trainerMessages: [],
   activeSubscription: null,
   sessionsPage: 1,
+  routinePage: 1,
+  routinePerPage: 3,
   currentInvoice: null,
 };
 
@@ -783,12 +785,33 @@ function renderRoutine() {
   $("routine-summary").textContent = routine
     ? `${routine.answers?.goal || "Objetivo"} · ${(routine.answers?.focuses || []).join(", ")} · ${routine.answers?.daysPerWeek || 3} dias/semana`
     : "Aun no tienes rutina activa.";
+  const routineExercises = routine?.exercises?.length
+    ? [...routine.exercises]
+        .map((exercise, originalIndex) => ({ exercise, originalIndex }))
+        .sort(
+          (a, b) =>
+            Number(a.exercise.order || 0) - Number(b.exercise.order || 0),
+        )
+    : [];
+  const totalRoutinePages = Math.max(
+    1,
+    Math.ceil(routineExercises.length / state.routinePerPage),
+  );
+  state.routinePage = Math.min(
+    Math.max(1, state.routinePage),
+    totalRoutinePages,
+  );
+  const pageExercises = routineExercises.slice(
+    (state.routinePage - 1) * state.routinePerPage,
+    state.routinePage * state.routinePerPage,
+  );
 
   $("routine-results").innerHTML =
-    routine?.exercises?.length
-      ? routine.exercises
-          .sort((a, b) => Number(a.order || 0) - Number(b.order || 0))
-          .map((exercise, index) => {
+    routineExercises.length
+      ? pageExercises
+          .map(({ exercise, originalIndex }, pageIndex) => {
+            const index =
+              (state.routinePage - 1) * state.routinePerPage + pageIndex;
             const embedUrl = youtubeEmbed(exercise.videoUrl);
             return `
               <article class="grid gap-4 rounded-[24px] border border-white/10 bg-white/[0.04] p-4 transition duration-500 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-cyan-400/[0.06] lg:grid-cols-[0.9fr_1.1fr]">
@@ -813,7 +836,7 @@ function renderRoutine() {
                   <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                       <span class="text-sm font-semibold ${exercise.completed ? "text-emerald-100" : "text-slate-300"}">${exercise.completed ? "Completado" : "Pendiente"}</span>
-                      <button data-routine-complete="${index}" type="button" class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100">
+                      <button data-routine-complete="${originalIndex}" type="button" class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100">
                         ${exercise.completed ? "Actualizar" : "Marcar hecho"}
                       </button>
                     </div>
@@ -833,6 +856,23 @@ function renderRoutine() {
           })
           .join("")
       : `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400">Crea tu rutina para ver el paso a paso y los videos.</div>`;
+  $("routine-pagination").classList.toggle(
+    "hidden",
+    routineExercises.length <= state.routinePerPage,
+  );
+  $("routine-pagination").classList.toggle(
+    "flex",
+    routineExercises.length > state.routinePerPage,
+  );
+  $("routine-page-info").textContent =
+    `Pagina ${state.routinePage} de ${totalRoutinePages}`;
+  $("routine-prev").disabled = state.routinePage === 1;
+  $("routine-next").disabled = state.routinePage === totalRoutinePages;
+  $("routine-prev").classList.toggle("opacity-50", state.routinePage === 1);
+  $("routine-next").classList.toggle(
+    "opacity-50",
+    state.routinePage === totalRoutinePages,
+  );
 }
 
 async function updateRoutineExercise(index) {
@@ -887,6 +927,7 @@ async function generateRoutine() {
     }),
   });
   state.currentRoutine = routine;
+  state.routinePage = 1;
   $("routine-generate-button").textContent = "Crear mi rutina";
   renderRoutine();
   toast("Rutina generada con videos y orden de trabajo.", "success");
@@ -1392,6 +1433,8 @@ function bindEvents() {
     const cancelButton = event.target.closest("[data-cancel-session]");
     const invoiceButton = event.target.closest("[data-invoice]");
     const routineButton = event.target.closest("[data-routine-complete]");
+    const routinePrev = event.target.closest("[data-routine-prev]");
+    const routineNext = event.target.closest("[data-routine-next]");
     if (buyButton) {
       buyPlan(buyButton.dataset.buyPlan).catch((error) =>
         toast(error.message, "error"),
@@ -1404,6 +1447,14 @@ function bindEvents() {
       updateRoutineExercise(Number(routineButton.dataset.routineComplete)).catch((error) =>
         toast(error.message, "error"),
       );
+    }
+    if (routinePrev) {
+      state.routinePage = Math.max(1, state.routinePage - 1);
+      renderRoutine();
+    }
+    if (routineNext) {
+      state.routinePage += 1;
+      renderRoutine();
     }
     if (cancelButton) {
       cancelSession(cancelButton.dataset.cancelSession).catch((error) =>
