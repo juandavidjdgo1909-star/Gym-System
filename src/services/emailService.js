@@ -3,10 +3,15 @@ import nodemailer from "nodemailer";
 const requiredMailVars = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"];
 
 const isMailConfigured = () =>
+  Boolean(process.env.BREVO_API_KEY) ||
   requiredMailVars.every((key) => Boolean(process.env[key]));
+
+const getMailProvider = () =>
+  process.env.BREVO_API_KEY ? "brevo" : "smtp";
 
 export const getMailStatus = () => ({
   configured: isMailConfigured(),
+  provider: getMailProvider(),
   host: process.env.SMTP_HOST || "",
   port: process.env.SMTP_PORT || "587",
   secure: process.env.SMTP_SECURE === "true",
@@ -36,6 +41,54 @@ const createTransporter = () =>
       pass: process.env.SMTP_PASS?.replace(/\s/g, ""),
     },
   });
+
+const parseAddress = (value) => {
+  const address = String(value || "").trim();
+  const match = address.match(/^(.*?)<([^>]+)>$/);
+  if (match) {
+    return {
+      name: match[1].trim() || "Gym-System",
+      email: match[2].trim(),
+    };
+  }
+  return {
+    name: process.env.EMAIL_FROM_NAME || "Gym-System",
+    email: address || process.env.SMTP_USER || "",
+  };
+};
+
+const parseRecipients = (value) =>
+  String(value || "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean)
+    .map((email) => ({ email }));
+
+const sendWithBrevo = async ({ to, subject, text, html }) => {
+  const sender = parseAddress(process.env.EMAIL_FROM || process.env.SMTP_USER);
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.BREVO_API_KEY,
+    },
+    body: JSON.stringify({
+      sender,
+      to: parseRecipients(to),
+      subject,
+      htmlContent: html,
+      textContent: text,
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      data.message || `Brevo no pudo enviar el correo (${response.status}).`,
+    );
+  }
+  return data;
+};
 
 const sessionText = (session) => {
   const trainer = session.trainer?.name || "Entrenador";
@@ -79,7 +132,15 @@ const sessionHtml = ({ title, intro, session, accent = "#22d3ee" }) => `
 export const sendMail = async ({ to, subject, text, html }) => {
   if (!to) return;
   if (!isMailConfigured()) {
-    throw new Error("Faltan SMTP_HOST, SMTP_USER o SMTP_PASS en variables de entorno.");
+    throw new Error(
+      "Falta BREVO_API_KEY o faltan SMTP_HOST, SMTP_USER y SMTP_PASS en variables de entorno.",
+    );
+  }
+
+  if (process.env.BREVO_API_KEY) {
+    const info = await sendWithBrevo({ to, subject, text, html });
+    console.log(`Correo enviado por Brevo a ${to}: ${info.messageId || "ok"}`);
+    return info;
   }
 
   const transporter = createTransporter();
