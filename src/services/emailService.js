@@ -1,17 +1,19 @@
 import nodemailer from "nodemailer";
 
 const requiredMailVars = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"];
+const brevoApiKey = () => process.env.BREVO_API_KEY?.trim();
 
 const isMailConfigured = () =>
-  Boolean(process.env.BREVO_API_KEY) ||
+  Boolean(brevoApiKey()) ||
   requiredMailVars.every((key) => Boolean(process.env[key]));
 
 const getMailProvider = () =>
-  process.env.BREVO_API_KEY ? "brevo" : "smtp";
+  brevoApiKey() ? "brevo" : "smtp";
 
 export const getMailStatus = () => ({
   configured: isMailConfigured(),
   provider: getMailProvider(),
+  brevoApiKeyLoaded: Boolean(brevoApiKey()),
   host: process.env.SMTP_HOST || "",
   port: process.env.SMTP_PORT || "587",
   secure: process.env.SMTP_SECURE === "true",
@@ -70,7 +72,7 @@ const sendWithBrevo = async ({ to, subject, text, html }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.BREVO_API_KEY,
+      "x-api-key": brevoApiKey(),
     },
     body: JSON.stringify({
       sender,
@@ -137,7 +139,7 @@ export const sendMail = async ({ to, subject, text, html }) => {
     );
   }
 
-  if (process.env.BREVO_API_KEY) {
+  if (brevoApiKey()) {
     const info = await sendWithBrevo({ to, subject, text, html });
     console.log(`Correo enviado por Brevo a ${to}: ${info.messageId || "ok"}`);
     return info;
