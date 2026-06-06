@@ -69,6 +69,36 @@ router.post("/test-email", async (req, res) => {
   }
 });
 
+router.get("/test-email", async (req, res) => {
+  try {
+    const to = req.query.to || process.env.SMTP_USER;
+    const info = await sendMail({
+      to,
+      subject: "Prueba de correo Gym-System",
+      text: "Si recibes este mensaje, el SMTP de Gym-System esta funcionando.",
+      html: `
+        <div style="font-family:Arial,sans-serif;background:#020617;color:#e2e8f0;padding:24px">
+          <h1 style="color:#fff">Prueba de correo Gym-System</h1>
+          <p>Si recibes este mensaje, el SMTP esta funcionando correctamente.</p>
+        </div>`,
+    });
+    res.status(200).json({
+      message: "Correo de prueba enviado",
+      to,
+      messageId: info?.messageId,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "No se pudo enviar el correo de prueba",
+      error: err.message,
+      code: err.code,
+      command: err.command,
+      response: err.response,
+      responseCode: err.responseCode,
+    });
+  }
+});
+
 router.put("/:id/read", async (req, res) => {
   try {
     const notification = await Notification.findByIdAndUpdate(
