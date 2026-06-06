@@ -72,7 +72,7 @@ const sendWithBrevo = async ({ to, subject, text, html }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": brevoApiKey(),
+      "api-key": brevoApiKey(),
     },
     body: JSON.stringify({
       sender,
