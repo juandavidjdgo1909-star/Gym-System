@@ -33,6 +33,15 @@ const money = (value) =>
   }).format(Number(value || 0));
 const fmtDate = (value) =>
   value ? new Date(value).toLocaleDateString("es-CO") : "Sin fecha";
+const bookingHours = [
+  "6:00 AM",
+  "7:00 AM",
+  "8:00 AM",
+  "5:00 PM",
+  "6:00 PM",
+  "7:00 PM",
+  "8:00 PM",
+];
 const youtubeEmbed = (url) => {
   const value = String(url || "").trim();
   if (!value) return "";
@@ -1210,7 +1219,7 @@ function renderBookingForm() {
 
   $("booking-hour").innerHTML =
     `<option value="" class="bg-slate-900">Selecciona una hora</option>` +
-    ["06:00", "07:00", "08:00", "17:00", "18:00", "19:00", "20:00"]
+    bookingHours
       .map((hour) => `<option value="${hour}" class="bg-slate-900">${hour}</option>`)
       .join("");
 

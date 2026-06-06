@@ -1,4 +1,5 @@
 import TrainingSession from "../models/trainingSession.js";
+import Notification from "../models/notification.js";
 import { sendTrainingSessionEmail } from "./emailService.js";
 
 const dateKey = (value) => (value ? new Date(value).toISOString() : "");
@@ -9,6 +10,98 @@ const notifySessionByEmail = async (type, session) => {
   } catch (error) {
     console.warn(`No se pudo enviar correo de cita (${type}): ${error.message}`);
   }
+};
+
+const sessionUserId = (value) => value?._id || value;
+
+const createNotification = async ({ user, role, title, message, type }) => {
+  try {
+    if (!user && role !== "Admin" && role !== "Todos") return;
+    await Notification.create({ user, role, title, message, type });
+  } catch (error) {
+    console.warn(`No se pudo crear notificacion: ${error.message}`);
+  }
+};
+
+const sessionSummary = (session) =>
+  `${new Date(session.date).toLocaleDateString("es-CO")} a las ${session.hour || "--:--"}`;
+
+const notifySessionAction = async (action, session) => {
+  const memberId = sessionUserId(session.member);
+  const trainerId = sessionUserId(session.trainer);
+  const memberName = session.member?.name || "Miembro";
+  const trainerName = session.trainer?.name || "Entrenador";
+  const when = sessionSummary(session);
+  const messages = {
+    created: [
+      {
+        user: memberId,
+        role: "Miembro",
+        title: "Solicitud enviada",
+        message: `Tu solicitud con ${trainerName} quedo registrada para ${when}.`,
+        type: "success",
+      },
+      {
+        user: trainerId,
+        role: "Entrenador",
+        title: "Nueva solicitud de cita",
+        message: `${memberName} solicito una cita para ${when}.`,
+        type: "info",
+      },
+    ],
+    confirmed: [
+      {
+        user: memberId,
+        role: "Miembro",
+        title: "Cita confirmada",
+        message: `${trainerName} confirmo tu cita para ${when}.`,
+        type: "success",
+      },
+      {
+        user: trainerId,
+        role: "Entrenador",
+        title: "Cita aceptada",
+        message: `Aceptaste la cita de ${memberName} para ${when}.`,
+        type: "success",
+      },
+    ],
+    cancelled: [
+      {
+        user: memberId,
+        role: "Miembro",
+        title: session.cancelReason ? "Cita rechazada" : "Cita cancelada",
+        message: session.cancelReason
+          ? `Tu cita para ${when} fue rechazada. Motivo: ${session.cancelReason}.`
+          : `Tu cita para ${when} fue cancelada.`,
+        type: "warning",
+      },
+      {
+        user: trainerId,
+        role: "Entrenador",
+        title: "Cita cancelada",
+        message: `${memberName} tiene una cita cancelada para ${when}.`,
+        type: "warning",
+      },
+    ],
+    rescheduled: [
+      {
+        user: memberId,
+        role: "Miembro",
+        title: "Cita reprogramada",
+        message: `Tu cita con ${trainerName} fue reprogramada para ${when}.`,
+        type: "info",
+      },
+      {
+        user: trainerId,
+        role: "Entrenador",
+        title: "Cita reprogramada",
+        message: `La cita de ${memberName} quedo para ${when}.`,
+        type: "info",
+      },
+    ],
+  }[action];
+
+  await Promise.all((messages || []).map(createNotification));
 };
 
 // Obtiene todas las sesiones de entrenamiento.
@@ -51,6 +144,7 @@ export const createTrainingSession = async (sessionData) => {
   const newSession = await session.save();
   await newSession.populate("trainer", "name email");
   await newSession.populate("member", "name email");
+  await notifySessionAction("created", newSession);
   await notifySessionByEmail("created", newSession);
   return newSession;
 };
@@ -79,10 +173,13 @@ export const updateTrainingSession = async (id, sessionData) => {
       previousHour !== (updatedSession.hour || ""));
 
   if (statusChanged && updatedSession.status === "Confirmada") {
+    await notifySessionAction("confirmed", updatedSession);
     await notifySessionByEmail("confirmed", updatedSession);
   } else if (statusChanged && updatedSession.status === "Cancelada") {
+    await notifySessionAction("cancelled", updatedSession);
     await notifySessionByEmail("cancelled", updatedSession);
   } else if (scheduleChanged) {
+    await notifySessionAction("rescheduled", updatedSession);
     await notifySessionByEmail("rescheduled", updatedSession);
   }
 

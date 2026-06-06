@@ -8,6 +8,7 @@ const state = {
   subscriptions: [],
   memberRoutines: [],
   trainerMessages: [],
+  notifications: [],
   selectedSessionId: null,
   trainerRoutinePage: 1,
   trainerRoutinePerPage: 2,
@@ -19,6 +20,13 @@ const getId = (value) => (typeof value === "object" ? value?._id : value);
 const pad = (value) => String(value).padStart(2, "0");
 const fmtDate = (value) =>
   value ? new Date(value).toLocaleDateString("es-CO") : "Sin fecha";
+const isValidTwelveHour = (value) =>
+  /^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM)$/i.test(String(value || "").trim());
+const normalizeTwelveHour = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/(am|pm)$/i, (match) => match.toUpperCase());
 const activeNavClass =
   "flex items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-3 text-sm font-medium text-sky-100 transition hover:-translate-y-0.5 hover:brightness-105";
 const inactiveNavClass =
@@ -146,15 +154,30 @@ function logout() {
 
 // Carga sesiones, usuarios, pagos y membresias.
 async function loadDashboard(selectionMode = "auto") {
-  const [sessions, users, subscriptions, memberRoutines, trainerMessages] = await Promise.all([
+  const [
+    sessions,
+    users,
+    subscriptions,
+    memberRoutines,
+    trainerMessages,
+    notifications,
+  ] = await Promise.all([
     api(`/training-sessions/trainer/${state.trainer._id}`),
     api("/users"),
     api("/subscriptions"),
     api("/member-routines"),
     api(`/trainer-messages?trainer=${state.trainer._id}`),
+    api(`/notifications?user=${state.trainer._id}&role=Entrenador`),
   ]);
 
-  Object.assign(state, { sessions, users, subscriptions, memberRoutines, trainerMessages });
+  Object.assign(state, {
+    sessions,
+    users,
+    subscriptions,
+    memberRoutines,
+    trainerMessages,
+    notifications,
+  });
   const selectedSession = state.sessions.find(
     (session) => session._id === state.selectedSessionId,
   );
@@ -499,6 +522,7 @@ function renderAll() {
   renderSelectedMember();
   renderPaymentCountdown();
   renderTrainerAgenda();
+  renderTrainerNotifications();
   renderTrainerMessages();
 }
 
@@ -513,6 +537,13 @@ function ensureTrainerUpgradePanels() {
           <h3 class="mt-3 text-2xl font-semibold text-white">Calendario visual de sesiones</h3>
         </div>
         <div id="trainer-agenda-grid" class="mt-5 grid gap-3 lg:grid-cols-7"></div>
+      </section>
+      <section id="trainer-notifications-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <div class="border-b border-white/10 pb-4">
+          <p class="text-xs uppercase tracking-[0.28em] text-amber-200/80">Actividad reciente</p>
+          <h3 class="mt-3 text-2xl font-semibold text-white">Acciones y avisos</h3>
+        </div>
+        <div id="trainer-notifications-list" class="mt-5 grid gap-3"></div>
       </section>
       <section id="trainer-message-panel" class="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
         <div class="border-b border-white/10 pb-4">
@@ -579,6 +610,33 @@ function renderTrainerAgenda() {
         </article>`,
     )
     .join("");
+}
+
+function renderTrainerNotifications() {
+  ensureTrainerUpgradePanels();
+  const tone = {
+    success: "text-emerald-100",
+    warning: "text-amber-100",
+    error: "text-rose-100",
+    info: "text-cyan-100",
+  };
+  $("trainer-notifications-list").innerHTML =
+    state.notifications
+      .slice(0, 6)
+      .map(
+        (item) => `
+        <article class="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-sm font-semibold ${tone[item.type] || tone.info}">${item.title}</p>
+              <p class="mt-1 text-sm leading-6 text-slate-400">${item.message}</p>
+            </div>
+            <span class="text-xs text-slate-500">${fmtDate(item.createdAt)}</span>
+          </div>
+        </article>`,
+      )
+      .join("") ||
+    `<div class="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">Sin acciones recientes por ahora.</div>`;
 }
 
 function renderTrainerMessages() {
@@ -671,11 +729,11 @@ async function rescheduleSession(id) {
     return;
   }
 
-  const hour = prompt("Nueva hora (HH:MM):", session?.hour || "");
+  const hour = prompt("Nueva hora (ej: 6:00 PM):", session?.hour || "");
   if (hour === null) return;
-  const cleanHour = hour.trim();
-  if (!/^\d{2}:\d{2}$/.test(cleanHour)) {
-    toast("Escribe la hora en formato HH:MM.", "error");
+  const cleanHour = normalizeTwelveHour(hour);
+  if (!isValidTwelveHour(cleanHour)) {
+    toast("Escribe la hora en formato 6:00 PM.", "error");
     return;
   }
 
