@@ -13,6 +13,7 @@ const authModal = document.getElementById("auth-modal");
 const authClose = document.getElementById("auth-close");
 const loginForm = document.getElementById("login-form");
 const registerForm = document.getElementById("register-form");
+const googleLoginButton = document.getElementById("google-login");
 const loginEmailInput = document.getElementById("loginEmail");
 const loginPasswordInput = document.getElementById("login-password");
 const registerNameInput = document.getElementById("register-name");
@@ -108,6 +109,24 @@ function redirectWithTransition(route, message = "Preparando dashboard") {
   setTimeout(() => {
     window.location.href = route;
   }, 900);
+}
+
+// Inicia el flujo OAuth de Google.
+function handleGoogleLogin() {
+  setElementDisabled(googleLoginButton, true);
+  showTransition("Conectando con Google");
+  window.location.href = `${API_BASE_URL}/users/auth/google`;
+}
+
+// Muestra errores devueltos por el callback de Google.
+function handleGoogleAuthResult() {
+  const params = new URLSearchParams(window.location.search);
+  const authError = params.get("authError");
+  if (!authError) return;
+
+  showNotification(authError, "error");
+  window.history.replaceState({}, document.title, window.location.pathname);
+  switchToLogin(false);
 }
 
 // Muestra notificaciones flotantes al usuario.
@@ -641,6 +660,7 @@ function initializeApp() {
   loginForm.reset();
   switchToLogin(false);
   closeAuthModal();
+  handleGoogleAuthResult();
   loadSiteContent();
   initializeTiltCards();
   initializeScrollReveal();
@@ -666,6 +686,7 @@ document.addEventListener("keydown", (event) => {
 heroRegister?.addEventListener("click", switchToRegister);
 plansRegister?.addEventListener("click", switchToRegister);
 offerRegister?.addEventListener("click", switchToLogin);
+googleLoginButton?.addEventListener("click", handleGoogleLogin);
 document.addEventListener("click", (event) => {
   if (event.target.closest("[data-plan-register]")) switchToRegister();
 });

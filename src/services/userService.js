@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import crypto from "node:crypto";
 
 // Quita la contrasena antes de enviar el usuario al frontend.
 const toPublicUser = (user) => {
@@ -114,4 +115,42 @@ export const loginUser = async ({ email, password }) => {
   }
 
   return toPublicUser(user);
+};
+
+// Crea o vincula un usuario que inicio sesion con Google.
+export const loginWithGoogle = async (profile) => {
+  const googleId = profile.sub;
+  const email = String(profile.email || "").toLowerCase();
+  const name = profile.name || profile.given_name || email.split("@")[0];
+
+  if (!googleId || !email) {
+    throw new Error("Google no envio los datos necesarios para iniciar sesion.");
+  }
+
+  let user =
+    (await User.findOne({ googleId })) || (await User.findOne({ email }));
+
+  if (user) {
+    user.googleId = user.googleId || googleId;
+    user.authProvider = user.authProvider === "local" ? "local" : "google";
+    user.avatarUrl = profile.picture || user.avatarUrl;
+    if (!user.name && name) user.name = name;
+    const savedUser = await user.save();
+    return toPublicUser(savedUser);
+  }
+
+  user = new User({
+    name,
+    email,
+    phone: `google-${googleId}`,
+    document: `google-${googleId}`,
+    password: await maybeHashPassword(crypto.randomBytes(24).toString("hex")),
+    googleId,
+    authProvider: "google",
+    avatarUrl: profile.picture || "",
+    rol: "Miembro",
+  });
+
+  const savedUser = await user.save();
+  return toPublicUser(savedUser);
 };

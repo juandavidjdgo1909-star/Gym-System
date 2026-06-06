@@ -31,6 +31,21 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
+    googleId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    avatarUrl: {
+      type: String,
+      trim: true,
+    },
     rol: {
       type: String,
       enum: ["Admin", "Miembro", "Entrenador"],
