@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Notification from "../models/notification.js";
+import { getMailStatus, sendMail } from "../services/emailService.js";
 
 const router = Router();
 
@@ -27,6 +28,44 @@ router.post("/", async (req, res) => {
     res.status(201).json(notification);
   } catch (err) {
     res.status(400).json({ message: "Error al crear notificacion", error: err.message });
+  }
+});
+
+router.get("/email-status", (req, res) => {
+  const status = getMailStatus();
+  res.status(200).json({
+    ...status,
+    user: status.user ? status.user.replace(/^(.{2}).*(@.*)$/, "$1***$2") : "",
+    from: status.from ? status.from.replace(/^(.{2}).*(@.*)$/, "$1***$2") : "",
+  });
+});
+
+router.post("/test-email", async (req, res) => {
+  try {
+    const to = req.body.to || process.env.SMTP_USER;
+    const info = await sendMail({
+      to,
+      subject: "Prueba de correo Gym-System",
+      text: "Si recibes este mensaje, el SMTP de Gym-System esta funcionando.",
+      html: `
+        <div style="font-family:Arial,sans-serif;background:#020617;color:#e2e8f0;padding:24px">
+          <h1 style="color:#fff">Prueba de correo Gym-System</h1>
+          <p>Si recibes este mensaje, el SMTP esta funcionando correctamente.</p>
+        </div>`,
+    });
+    res.status(200).json({
+      message: "Correo de prueba enviado",
+      to,
+      messageId: info?.messageId,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "No se pudo enviar el correo de prueba",
+      error: err.message,
+      code: err.code,
+      command: err.command,
+      response: err.response,
+    });
   }
 });
 

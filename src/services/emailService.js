@@ -5,6 +5,15 @@ const requiredMailVars = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"];
 const isMailConfigured = () =>
   requiredMailVars.every((key) => Boolean(process.env[key]));
 
+export const getMailStatus = () => ({
+  configured: isMailConfigured(),
+  host: process.env.SMTP_HOST || "",
+  port: process.env.SMTP_PORT || "587",
+  secure: process.env.SMTP_SECURE === "true",
+  user: process.env.SMTP_USER || "",
+  from: process.env.EMAIL_FROM || process.env.SMTP_USER || "",
+});
+
 const fmtDate = (value) =>
   value ? new Date(value).toLocaleDateString("es-CO") : "Sin fecha";
 
@@ -69,26 +78,25 @@ const sessionHtml = ({ title, intro, session, accent = "#22d3ee" }) => `
 export const sendMail = async ({ to, subject, text, html }) => {
   if (!to) return;
   if (!isMailConfigured()) {
-    console.warn(
-      "Correo no enviado: faltan SMTP_HOST, SMTP_USER o SMTP_PASS en .env.",
-    );
-    return;
+    throw new Error("Faltan SMTP_HOST, SMTP_USER o SMTP_PASS en variables de entorno.");
   }
 
   const transporter = createTransporter();
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: process.env.EMAIL_FROM || process.env.SMTP_USER,
     to,
     subject,
     text,
     html,
   });
+  console.log(`Correo enviado a ${to}: ${info.messageId}`);
+  return info;
 };
 
 export const sendTrainingSessionEmail = async ({ type, session }) => {
   const memberEmail = session.member?.email;
   const memberName = session.member?.name || "Hola";
-  const copyTrainer = process.env.SEND_TRAINER_SESSION_EMAIL === "true";
+  const copyTrainer = process.env.SEND_TRAINER_SESSION_EMAIL !== "false";
   const trainerEmail = session.trainer?.email;
   const config = {
     created: {
@@ -124,19 +132,15 @@ export const sendTrainingSessionEmail = async ({ type, session }) => {
   const html = sessionHtml({ ...config, session });
   const text = `${config.intro}\n\n${sessionText(session)}`;
 
+  const recipients = [
+    memberEmail,
+    copyTrainer ? trainerEmail : null,
+  ].filter(Boolean);
+
   await sendMail({
-    to: memberEmail,
+    to: [...new Set(recipients)].join(", "),
     subject: config.subject,
     text,
     html,
   });
-
-  if (copyTrainer && trainerEmail) {
-    await sendMail({
-      to: trainerEmail,
-      subject: `[Entrenador] ${config.subject}`,
-      text,
-      html,
-    });
-  }
 };
