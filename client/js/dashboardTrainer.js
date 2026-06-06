@@ -286,6 +286,7 @@ function renderRequests() {
             </div>
             <div class="flex flex-wrap gap-2">
               <button data-view-session="${session._id}" class="rounded-2xl border border-sky-400/20 bg-sky-400/10 px-4 py-2 text-sm font-medium text-sky-100 transition hover:-translate-y-0.5">Ver ficha</button>
+              <button data-reschedule-session="${session._id}" class="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-sm font-medium text-amber-100 transition hover:-translate-y-0.5">Reprogramar</button>
               <button data-accept-session="${session._id}" class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:-translate-y-0.5">Aceptar</button>
               <button data-reject-session="${session._id}" class="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm font-medium text-rose-100 transition hover:-translate-y-0.5">Rechazar</button>
             </div>
@@ -656,6 +657,36 @@ async function updateSessionStatus(id, status, cancelReason = "") {
   await loadDashboard(status === "Cancelada" ? "pendingOnly" : "auto");
 }
 
+// Reprograma una solicitud y avisa por correo al miembro.
+async function rescheduleSession(id) {
+  const session = state.sessions.find((item) => item._id === id);
+  const currentDate = session?.date
+    ? new Date(session.date).toISOString().slice(0, 10)
+    : "";
+  const date = prompt("Nueva fecha (YYYY-MM-DD):", currentDate);
+  if (date === null) return;
+  const cleanDate = date.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
+    toast("Escribe la fecha en formato YYYY-MM-DD.", "error");
+    return;
+  }
+
+  const hour = prompt("Nueva hora (HH:MM):", session?.hour || "");
+  if (hour === null) return;
+  const cleanHour = hour.trim();
+  if (!/^\d{2}:\d{2}$/.test(cleanHour)) {
+    toast("Escribe la hora en formato HH:MM.", "error");
+    return;
+  }
+
+  await api(`/training-sessions/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ date: cleanDate, hour: cleanHour }),
+  });
+  toast("Solicitud reprogramada y notificada.", "success");
+  await loadDashboard("auto");
+}
+
 // Conecta eventos del panel.
 function bindEvents() {
   $("trainer-logout").addEventListener("click", logout);
@@ -665,6 +696,7 @@ function bindEvents() {
     const navLink = event.target.closest('aside nav a[href^="#"]');
     const viewButton = event.target.closest("[data-view-session]");
     const acceptButton = event.target.closest("[data-accept-session]");
+    const rescheduleButton = event.target.closest("[data-reschedule-session]");
     const rejectButton = event.target.closest("[data-reject-session]");
 
     if (navLink) {
@@ -693,6 +725,11 @@ function bindEvents() {
         acceptButton.dataset.acceptSession,
         "Confirmada",
       ).catch((error) => toast(error.message, "error"));
+    }
+    if (rescheduleButton) {
+      rescheduleSession(rescheduleButton.dataset.rescheduleSession).catch(
+        (error) => toast(error.message, "error"),
+      );
     }
     if (rejectButton) {
       const reason = prompt("Escribe el motivo para rechazar la solicitud:");
