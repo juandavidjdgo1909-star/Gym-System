@@ -8,11 +8,16 @@ router.get("/", async (req, res) => {
   try {
     const { user, role } = req.query;
     const query = {};
-    if (user || role) {
+    if (user) {
+      query.$or = [
+        { user },
+        { role: "Todos", user: null },
+        ...(role ? [{ role, user: null }] : []),
+      ];
+    } else if (role) {
       query.$or = [
         { role: "Todos" },
-        ...(role ? [{ role }] : []),
-        ...(user ? [{ user }] : []),
+        { role },
       ];
     }
     const notifications = await Notification.find(query).sort({ createdAt: -1 }).limit(80);
